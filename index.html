@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="SwingTag — Group 02 investigation story, circuit evolution and performance characterisation." />
+  <title>SwingTag — Group 02 Investigation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="enhancements.css" />
+  <link rel="stylesheet" href="game.css" />
+</head>
+<body>
+  <div class="noise"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="SwingTag home">
+      <img class="brand-logo" src="assets/swingtag-logo.jpg" alt="SwingTag" />
+      <span>
+        <strong>SwingTag</strong>
+        <small>Group 02 · Wits Electrical Engineering</small>
+      </span>
+    </a>
+    <button id="menuBtn" class="menu-btn" type="button" aria-controls="siteNav" aria-expanded="false">Menu</button>
+    <nav class="nav" id="siteNav">
+      <a href="#story">Story</a>
+      <a href="#circuit">Circuit</a>
+      <a href="#evidence">Evidence</a>
+      <a href="#lab">Energy Lab</a>
+      <a href="#game">NFC Game</a>
+      <a href="#people">Team</a>
+      <a href="#ai">AI use</a>
+    </nav>
+    <button id="themeBtn" class="ghost-btn" type="button" aria-label="Toggle colour mode">Colour shift</button>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy reveal">
+        <div class="eyebrow">GROUP 02 · FINAL-YEAR INVESTIGATION</div>
+        <h1>
+          One tiny label.<br>
+          <span>One very serious energy problem.</span>
+        </h1>
+        <p class="hero-lead">
+          SwingTag is a standalone electronic shelf label combining an e-paper display,
+          an STM32 microcontroller and an NFC link. We are designing the system, then
+          quantitatively testing whether it updates reliably, quickly and efficiently.
+        </p>
+        <div class="hero-actions">
+          <a class="primary-btn" href="#story">Start the story ↓</a>
+          <a class="secondary-btn" href="#lab">Play with the energy model</a>
+        </div>
+        <div class="hero-stats" aria-label="Current project indicators">
+          <div><strong>4700 µF</strong><span>current prototype storage</span></div>
+          <div><strong>3.165 V</strong><span>simulated ON threshold</span></div>
+          <div><strong>2.885 V</strong><span>simulated OFF threshold</span></div>
+          <div class="observed-stat"><strong>≈10–15 s</strong><span>observed charge window*</span></div>
+        </div>
+        <p class="hero-note">*Current practical observation using the 4700 µF capacitor. The final value will be reported with reader distance, orientation, voltage endpoints and repeat count.</p>
+      </div>
+
+      <div class="hero-visual reveal">
+        <div class="tag-shell">
+          <div class="tag-screen">
+            <span class="screen-kicker">SWINGTAG</span>
+            <strong>R 39.99</strong>
+            <small>tap · harvest · update</small>
+          </div>
+          <div class="nfc-rings"><i></i><i></i><i></i></div>
+          <div class="energy-dot d1"></div><div class="energy-dot d2"></div><div class="energy-dot d3"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="statement section reveal">
+      <div class="section-kicker">THE INVESTIGATION</div>
+      <h2>What are we actually trying to prove?</h2>
+      <div class="question-card">
+        <div class="q-badge">?</div>
+        <p>Across three defined NFC test distances, what first-attempt update success rate and end-to-end update latency does a standalone SwingTag prototype achieve, and how much energy does one display update consume?</p>
+      </div>
+      <div class="two-col">
+        <article class="glass-card"><h3>Intended outcome</h3><p>Produce one working prototype, measure update reliability, latency and energy use, and use those measurements to estimate battery life for hourly and daily update schedules.</p></article>
+        <article class="glass-card"><h3>Why the power work matters</h3><p>An e-paper display holds an image without continuous power, but an update still needs a short burst of energy. Our circuit investigation asks whether energy can be collected, stored, gated and delivered cleanly enough to support the MCU and eventually the display.</p></article>
+      </div>
+      <aside class="field-note" aria-label="Current laboratory observation">
+        <div class="pulse-dot"></div>
+        <div><span>CURRENT LAB OBSERVATION</span><strong>The 4700 µF capacitor is charging in approximately 10–15 seconds in the present setup.</strong><p>This is a preliminary observed range, not yet a fully characterised result. We still need to record the starting and ending voltages, reader distance, alignment and repeat count.</p></div>
+      </aside>
+      <div class="investigation-link">
+        <div><span>WHY 4700 µF?</span><h3>It turns the project question into a measurable energy test.</h3><p>We will charge this capacitor from the NFC harvesting path, release its stored energy into the regulated STM32 and e-paper load, and determine whether one complete update succeeds.</p></div>
+        <div class="energy-equation"><span>CALCULATED SCREENING VALUE</span><strong>≈4.0 mJ</strong><p>Usable capacitor energy between the simulated 3.165 V ON and 2.885 V OFF thresholds:</p><code>E = ½C(V<sub>ON</sub>² − V<sub>OFF</sub>²)</code></div>
+        <div class="pass-question"><span>PASS QUESTION</span><strong>Does one charge complete one update?</strong><p>We must compare stored input energy, conversion losses, update success and measured display-update energy. If the available margin is insufficient, storage or thresholds must change.</p></div>
+      </div>
+    </section>
+
+    <section id="circuit" class="section dark-panel reveal">
+      <div class="section-kicker">THE SYSTEM</div>
+      <h2>Follow the energy</h2>
+      <p class="section-intro">Click each block. The page reveals what that part does and why it was added.</p>
+      <div class="system-flow" id="systemFlow">
+        <button class="flow-node active" data-key="nfc">NFC / V<sub>EH</sub></button><span>→</span>
+        <button class="flow-node" data-key="store">C<sub>STORE</sub></button><span>→</span>
+        <button class="flow-node" data-key="sense">LTC1540</button><span>→</span>
+        <button class="flow-node" data-key="switch">2N3904 + PMOS</button><span>→</span>
+        <button class="flow-node" data-key="reg">3.3 V rail</button><span>→</span>
+        <button class="flow-node" data-key="mcu">STM32</button><span>→</span>
+        <button class="flow-node" data-key="epaper">E-paper</button>
+      </div>
+      <div class="flow-explainer" id="flowExplainer"></div>
+    </section>
+
+    <section id="story" class="section reveal">
+      <div class="section-kicker">CIRCUIT EVOLUTION</div>
+      <h2>We did not jump straight to the final circuit.</h2>
+      <p class="section-intro">Each stage answered one question before we allowed ourselves to add more complexity.</p>
+      <div class="timeline">
+        <article class="stage-card done"><div class="stage-top"><span>V1A</span><b>Complete</b></div><h3>Can the source charge storage?</h3><p>We began with an illustrative 3.3 V source and 1 kΩ source resistance. In that model, the selected 4700 µF capacitor reached 3.0 V in about 11.6 s. The 0.47 F capacitor was retained only as a larger-storage comparison.</p><div class="stage-chip">4700 µF selected</div><div class="stage-chip">0.47 F comparison</div></article>
+        <article class="stage-card done"><div class="stage-top"><span>V1B</span><b>Complete</b></div><h3>Can we stop the storage capacitor feeding backwards?</h3><p>A Schottky isolation path was introduced and checked for forward drop and energy retention. The model showed only a small voltage change after source removal.</p><div class="stage-chip">Schottky</div><div class="stage-chip">isolation</div></article>
+        <article class="stage-card done"><div class="stage-top"><span>V2A</span><b>Complete</b></div><h3>Can the system switch automatically?</h3><p>An ideal hysteretic switch model proved the charge–use–recharge concept before replacing it with a real comparator.</p><div class="stage-chip">hysteresis</div><div class="stage-chip">automatic cycling</div></article>
+        <article class="stage-card done accent"><div class="stage-top"><span>V2B</span><b>Complete</b></div><h3>Can a real ultra-low-power comparator do it?</h3><p>We replaced the ideal switch with the LTC1540 macromodel and verified automatic charge, enable, discharge, shut-down and recharge behaviour.</p><div class="metric-strip"><div><strong>3.165 V</strong><span>simulated ON</span></div><div><strong>2.885 V</strong><span>simulated OFF</span></div><div><strong>≈533 s</strong><span>simulated recharge</span></div></div></article>
+        <article class="stage-card done"><div class="stage-top"><span>V2B-3</span><b>Complete</b></div><h3>Can the comparator drive a physical high-side switch?</h3><p>The LTC1540 output was connected to a 2N3904 and P-channel MOSFET. The switching chain isolates the downstream regulator while storage charges, then reconnects it inside the usable voltage window.</p><div class="stage-chip">2N3904</div><div class="stage-chip">PMOS</div><div class="stage-chip">high-side switching</div></article>
+        <article class="stage-card done"><div class="stage-top"><span>V3A</span><b>Complete</b></div><h3>How sensitive is run time to MCU current?</h3><p>We swept three equivalent MCU loads. The heavier the load, the shorter the available powered interval — while the recharge time stayed almost unchanged.</p><div class="mini-table"><div><span>1.6 mA</span><strong>68.6 s</strong></div><div><span>5.4 mA</span><strong>18.5 s</strong></div><div><span>10 mA</span><strong>9.84 s</strong></div></div></article>
+        <article class="stage-card current"><div class="stage-top"><span>V3B-2</span><b>Simulated</b></div><h3>What happens when the MCU behaves like an MCU?</h3><p>We replaced the resistor model with a current sink, then introduced a dynamic boot/run profile. A simulated 8 mA boot followed by 5.4 mA running produced an approximately 17.58 s powered interval.</p><div class="metric-strip"><div><strong>8 mA</strong><span>assumed boot</span></div><div><strong>5.4 mA</strong><span>assumed run</span></div><div><strong>80%</strong><span>assumed efficiency</span></div></div></article>
+        <article class="stage-card planned"><div class="stage-top"><span>Next</span><b>Planned</b></div><h3>MCU + e-paper + measured NFC source</h3><p>The next proof is a finite MCU task and e-paper refresh, followed by replacing the illustrative source with laboratory measurements of the actual NFC energy-harvesting path.</p><div class="stage-chip">V3C e-paper</div><div class="stage-chip">V4 measured source</div><div class="stage-chip">V5 physical validation</div></article>
+      </div>
+    </section>
+
+    <section id="evidence" class="section evidence-section reveal">
+      <div class="section-kicker">EVIDENCE DESK</div>
+      <h2>Open the model. Trace the claim.</h2>
+      <p class="section-intro">The website ships with lightweight LTspice source files and the first charging comparison. Large <code>.raw</code> files remain in the working archive rather than the GitHub Pages bundle.</p>
+      <div class="evidence-grid">
+        <figure class="evidence-plot glass-card">
+          <img src="assets/step-1-charge-curves.svg" alt="LTspice charging curves comparing the Version 1 storage capacitors" />
+          <figcaption><span>SIMULATED</span><strong>Version 1 storage charging comparison</strong><p>Generated from the LTspice screening model. The source parameters remain assumptions until replaced by measured NFC harvester data.</p></figcaption>
+        </figure>
+        <div class="evidence-stack">
+          <article class="evidence-card"><span>MODEL ARCHIVE</span><strong>Stages 0 → V3B-2</strong><p>The working folder contains source characterisation, storage, regulator, isolation, hysteresis, LTC1540, PMOS-switch and MCU-load simulations.</p></article>
+          <article class="evidence-card"><span>BENCH EVIDENCE</span><strong>Discrete supervisor switching demonstrated</strong><p>The breadboard work has shown the sensing-to-switching chain operating. Threshold repeatability, the falling threshold and storage-integrated behaviour still require controlled measurement.</p></article>
+          <article class="evidence-card warning"><span>CONNECTING MODEL TO HARDWARE</span><strong>The 4700 µF result is now the relevant comparison</strong><p>The illustrative model predicted about 11.6 s to reach 3.0 V. The present practical observation is approximately 10–15 s. That agreement is encouraging, but it is not validation until the voltage endpoints and NFC test conditions are controlled and repeated.</p></article>
+          <a class="download-card" href="assets/swingtag-ltspice-source-pack.zip" download><span>↓</span><div><strong>Download LTspice source pack</strong><small>ASC, CIR, CSV, SVG, report source and notes · no large RAW files</small></div></a>
+        </div>
+      </div>
+      <div class="stage-index" aria-label="Included simulation stages">
+        <span>Stage 0 · V<sub>EH</sub></span><span>Stage 1 · Storage</span><span>Stage 2A–2C · Regulator</span><span>V1B · Isolation</span><span>V2A · Hysteresis</span><span>V2B1–3 · LTC1540 + PMOS</span><span>V3A–V3B2 · MCU load</span>
+      </div>
+    </section>
+
+    <section id="lab" class="section lab-section reveal">
+      <div class="section-kicker">INTERACTIVE ENERGY LAB</div>
+      <h2>What does MCU current do to operating time?</h2>
+      <p class="section-intro">Drag the slider to explore the earlier 0.47 F screening model. This historical comparison shows load sensitivity, but it does not represent the current 4700 µF breadboard storage or replace measured hardware data.</p>
+      <div class="lab-grid">
+        <div class="lab-control glass-card">
+          <label for="currentSlider">MCU load current</label>
+          <input id="currentSlider" type="range" min="1.6" max="10" value="5.4" step="0.1" />
+          <div class="big-readout"><span id="currentValue">5.4</span> mA</div>
+          <div class="lab-result"><span>Estimated powered interval</span><strong><span id="runtimeValue">18.5</span> s</strong></div>
+          <div class="battery" aria-label="Visual energy window"><div class="battery-fill" id="batteryFill"></div></div>
+          <small>Historical simulation screening model: 0.47 F storage, ~3.165 V ON, ~2.885 V OFF. Current prototype storage: 4700 µF.</small>
+        </div>
+        <div class="chart-card">
+          <svg id="runtimeChart" viewBox="0 0 640 320" role="img" aria-label="Runtime versus load current chart">
+            <line x1="70" y1="270" x2="610" y2="270" class="axis"/><line x1="70" y1="30" x2="70" y2="270" class="axis"/>
+            <text x="330" y="305" class="axis-label">MCU current (mA)</text><text x="18" y="155" class="axis-label rotate">ON time (s)</text>
+            <path id="curvePath" class="curve" d=""></path><circle id="chartDot" class="chart-dot" cx="0" cy="0" r="8"></circle>
+          </svg>
+          <div class="legend-row"><span><i class="legend-dot l1"></i>V3A simulation points</span><span><i class="legend-dot l2"></i>interpolated estimate</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="game" class="section nfc-game reveal">
+      <div class="game-heading">
+        <div><div class="section-kicker">THE NFC SWEET-SPOT CHALLENGE</div><h2>Bring the phone close. Not that close.</h2></div>
+        <p>Help Sergio position the phone relative to the e-paper control system held by Masixole. The current team measurement places the optimal operating window at approximately <strong>1.5–2.0 cm</strong>. Reach at least <strong>87% estimated coupling</strong> inside that window to unlock a personalised 3D tag.</p>
+      </div>
+
+      <div class="game-grid">
+        <div class="game-stage" id="gameStage" style="--sergio-left:4%">
+          <div class="game-hud">
+            <div><span>DISTANCE</span><strong><output id="distanceOutput">7.5</output> cm</strong></div>
+            <div><span>SIGNAL ESTIMATE</span><strong id="signalOutput">58%</strong></div>
+            <div><span>ATTEMPTS</span><strong id="attemptOutput">0</strong></div>
+          </div>
+
+          <div class="nfc-scene" aria-label="Sergio holding a phone opposite Masixole holding the SwingTag e-paper system">
+            <div class="character sergio-character" id="sergioCharacter">
+              <div class="name-flag">Sergio</div>
+              <svg viewBox="0 0 220 260" role="img" aria-label="Cartoon Sergio holding an NFC phone">
+                <circle cx="104" cy="52" r="34" fill="#70422f"/><path d="M72 48c3-30 57-42 70-3-18-9-47-9-70 3Z" fill="#171622"/>
+                <rect x="66" y="88" width="83" height="105" rx="30" fill="#7c3aed"/><path d="M75 112 38 146" stroke="#70422f" stroke-width="18" stroke-linecap="round"/><path d="M140 111 174 131" stroke="#70422f" stroke-width="18" stroke-linecap="round"/>
+                <rect x="168" y="111" width="29" height="55" rx="6" fill="#16151f"/><rect x="172" y="117" width="21" height="38" rx="3" fill="#05c7d9"/><circle cx="182.5" cy="160" r="2.8" fill="#fff"/>
+                <path d="M83 189 75 242M132 189l13 53" stroke="#242231" stroke-width="19" stroke-linecap="round"/>
+              </svg>
+              <span class="object-label">NFC phone</span>
+            </div>
+
+            <div class="field-visual" aria-hidden="true"><i></i><i></i><i></i><b id="fieldSpark">⚡</b></div>
+
+            <div class="character masixole-character">
+              <div class="name-flag">Masixole</div>
+              <svg viewBox="0 0 220 260" role="img" aria-label="Cartoon Masixole holding the SwingTag e-paper controller">
+                <circle cx="112" cy="52" r="34" fill="#5b3528"/><path d="M80 43c9-27 58-34 67 5-23-10-43-11-67-5Z" fill="#101117"/>
+                <rect x="70" y="88" width="86" height="105" rx="30" fill="#ff4f9a"/><path d="M82 112 47 143" stroke="#5b3528" stroke-width="18" stroke-linecap="round"/><path d="M146 111 172 137" stroke="#5b3528" stroke-width="18" stroke-linecap="round"/>
+                <rect x="27" y="125" width="67" height="48" rx="9" fill="#f7f2df" stroke="#171622" stroke-width="6"/><text x="60" y="145" text-anchor="middle" font-size="8" font-family="sans-serif" fill="#7c3aed">SWINGTAG</text><text x="60" y="160" text-anchor="middle" font-size="13" font-weight="700" font-family="sans-serif">R39.99</text>
+                <path d="M88 189 78 242M139 189l12 53" stroke="#242231" stroke-width="19" stroke-linecap="round"/>
+              </svg>
+              <span class="object-label">E-paper tag</span>
+            </div>
+
+            <div class="tag-reveal" id="tagReveal" aria-live="polite" aria-hidden="true">
+              <div class="tag-card-3d">
+                <div class="tag-lanyard" aria-hidden="true"></div>
+                <div class="tag-card-face">
+                  <span class="tag-brand">SWINGTAG</span>
+                  <span class="tag-refresh-label">E-PAPER REFRESH COMPLETE</span>
+                  <strong id="tagEngineerName">NFC Engineer</strong>
+                  <span class="tag-award">87%+ COUPLING CHAMPION</span>
+                  <div class="tag-nfc-mark" aria-hidden="true"><i></i><i></i><i></i></div>
+                </div>
+                <div class="tag-timer"><span></span></div>
+              </div>
+            </div>
+
+            <div class="distance-ruler" aria-hidden="true"><span>0 cm</span><div class="ruler-line"></div><span>15 cm</span></div>
+          </div>
+        </div>
+
+        <aside class="game-panel">
+          <label class="player-field" for="playerName">Engineer name <span>for this device's leaderboard</span></label>
+          <input id="playerName" class="player-input" type="text" maxlength="18" autocomplete="nickname" placeholder="e.g. NFC Ninja" />
+
+          <label class="distance-label" for="distanceSlider">Set the phone-to-tag distance</label>
+          <input id="distanceSlider" class="distance-slider" type="range" min="0" max="15" value="7.5" step="0.1" />
+          <div class="range-labels"><span>0 cm · almost touching</span><span>15 cm · ambitious</span></div>
+
+          <div class="game-actions">
+            <button id="testDistanceBtn" class="game-primary" type="button">Test this distance</button>
+            <button id="resetGameBtn" class="game-secondary" type="button">New round</button>
+          </div>
+
+          <div class="game-result idle" id="gameResult" role="status" aria-live="polite">
+            <span>READY</span><strong>Find the NFC sweet spot.</strong><p>Adjust the slider, then test your distance. The game will explain what the result means.</p>
+          </div>
+          <p class="game-caveat">Teaching game based on the team's current measured optimum of approximately 1.5–2.0 cm. The 87% indicator is a game estimate, not a measured RF efficiency. Reader model, antenna orientation and repeatability still belong in the formal test record.</p>
+        </aside>
+      </div>
+
+      <div class="leaderboard-card">
+        <div><div class="section-kicker">LOCAL LEADERBOARD</div><h3>Coupling champions</h3><p>Scores are stored in this browser. A shared public leaderboard can be connected later using a small database service.</p></div>
+        <div class="leaderboard-table-wrap"><table><thead><tr><th>#</th><th>Engineer</th><th>Score</th><th>Distance</th><th>Tries</th></tr></thead><tbody id="leaderboardBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <div class="section-kicker">ENGINEERING INTEGRITY</div>
+      <h2>Measured, simulated and assumed are not the same thing.</h2>
+      <div class="three-col">
+        <article class="truth-card measured"><span>MEASURED</span><h3>Laboratory evidence</h3><p>Reader distance, update success, update latency, actual V<sub>EH</sub>, load current and display-update energy belong here once measured on hardware.</p></article>
+        <article class="truth-card simulated"><span>SIMULATED</span><h3>Model behaviour</h3><p>LTC1540 thresholds, charge/discharge cycles, MOSFET control and load sensitivity are currently being explored in LTspice.</p></article>
+        <article class="truth-card assumed"><span>ASSUMED</span><h3>Temporary design inputs</h3><p>The 3.3 V / 1 kΩ source and some MCU load states are screening assumptions. They must not be presented as measured NFC performance.</p></article>
+      </div>
+    </section>
+
+    <section id="ai" class="section ai-section reveal">
+      <div class="section-kicker">RESPONSIBLE AI USE</div>
+      <h2>Our “third group member” is a tutor, not the engineer of record.</h2>
+      <div class="ai-card"><div class="ai-orb">AI</div><p>We use AI as an interactive technical discussion partner: to challenge assumptions, troubleshoot simulations, work through calculations, organise the investigation and improve documentation. AI suggestions are not accepted automatically. Sergio and Masixole remain responsible for the engineering decisions, LTspice models, hardware construction, measurements, datasheet checks and interpretation of results. Suggested values or explanations are verified against circuit theory, manufacturer documentation, simulation outputs and physical measurements before they are used in the investigation.</p></div>
+    </section>
+
+    <section id="people" class="section reveal">
+      <div class="section-kicker">GROUP 02</div>
+      <h2>The people building SwingTag</h2>
+      <div class="people-grid">
+        <article class="person-card"><img src="https://dsl-masters-interest.netlify.app/assets/students/sergio-lephadi.jpg" alt="Portrait of Sergio Lephadi" /><div><h3>Sergio Lephadi</h3><p>Final-year Electrical Engineering student who enjoys building things that can have a positive impact. Football, gaming, the occasional good book — and yes, dad jokes.</p><span class="person-tag">Power path · MCU · simulation</span></div></article>
+        <article class="person-card"><img src="https://dsl-masters-interest.netlify.app/assets/students/masixole-jokanisi.jpg" alt="Portrait of Masixole Jokanisi" /><div><h3>Masixole Jokanisi</h3><p>Final-year Electrical Engineering student who enjoys turning ideas into practical solutions, tutoring, soccer, gaming and exploring new technology.</p><span class="person-tag">NFC · antenna · physical validation</span></div></article>
+      </div>
+    </section>
+
+    <section class="section final-cta reveal"><div><div class="section-kicker">THE STORY IS STILL BEING WRITTEN</div><h2>Next stop: one complete e-paper update.</h2><p>The site will grow with the investigation. Each new circuit stage, waveform and physical measurement becomes another chapter — including the failures, because they are part of the engineering.</p></div><a class="primary-btn" href="https://dsllab.app/projects/group-02/" target="_blank" rel="noreferrer">Project page ↗</a></section>
+  </main>
+
+  <footer><span>SwingTag · Group 02 · 2026</span><span>Living engineering record · updated 6 October 2026</span></footer>
+  <script src="script.js"></script>
+  <script src="enhancements.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

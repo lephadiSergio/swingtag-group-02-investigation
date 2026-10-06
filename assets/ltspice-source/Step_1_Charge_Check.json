@@ -1,0 +1,26 @@
+{
+  "model": {
+    "voc_V": 3.3,
+    "rsrc_ohm": 1000,
+    "roff_ohm": 100000,
+    "cfilter_F": 1e-8
+  },
+  "results": [
+    {
+      "case": "A",
+      "capacitance_F": 0.0047,
+      "tau_s": 4.653475247524753,
+      "vFinal_V": 3.267326732673267,
+      "ltspice_t3_s": 11.6488280629,
+      "analytic_t3_s": 11.648838849803973
+    },
+    {
+      "case": "B",
+      "capacitance_F": 0.47,
+      "tau_s": 465.3465445544554,
+      "vFinal_V": 3.267326732673267,
+      "ltspice_t3_s": 1164.88129053,
+      "analytic_t3_s": 1164.88143129403
+    }
+  ]
+}

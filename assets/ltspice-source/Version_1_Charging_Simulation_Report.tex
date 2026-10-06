@@ -1,0 +1,93 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage[T1]{fontenc}
+
+\title{Version 1 Energy-Storage Circuit: LTspice Charging Simulation}
+\author{Sergio Lephadi \and Masixole (antenna and NFC interface)}
+\date{13 September 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Two selectable storage capacitors for a breadboard energy-harvesting circuit were compared in LTspice before hardware construction. The NFC tag's energy-harvesting output was represented by an assumed 3.3~V source with 1~k$\Omega$ series resistance. With the regulator disabled, a 4700~$\mu$F capacitor reached 3.0~V after 11.649~s, whereas a 0.47~F capacitor took 1164.881~s (19.41~min). The results agree with a first-order resistance--capacitance calculation. These times are conditional on the assumed source and continuous RF field; they are not measurements or predictions for Masixole's antenna. The next step is to measure the actual energy-harvesting output under controlled loads before evaluating the regulator or display.
+\end{abstract}
+
+\section{Purpose and circuit boundary}
+The purpose of this simulation was to estimate how long each Version 1 storage option would take to reach the proposed regulator's start-up voltage. Masixole's board contains the antenna and ST25DV energy-harvesting interface. The breadboard circuit begins at its $V_{\rm EH}$ and ground pins. The ST device already produces a rectified DC output, so an additional bridge rectifier was not included in Version 1 \cite{st-an4913}. The planned circuit places a 10~nF bypass capacitor and one selectable storage capacitor across $V_{\rm EH}$, followed by a manually controlled 3.3~V buck--boost module. The module's specified minimum start-up input is 3.0~V; it can operate down to 2.0~V after starting \cite{pololu-5712}.
+
+Only the charging stage was simulated here. The regulator remained disabled, and no e-paper display or output load was modelled. Therefore, reaching 3.0~V in this study does not establish that the regulator can start or sustain an update from the real NFC source. The Version 1 breadboard design and drawing are recorded in the parent \texttt{05\_Power\_Tests} folder.
+
+\section{Model and method}
+The two LTspice decks are \texttt{Step\_1\_Charge\_4700uF.cir} and \texttt{Step\_1\_Charge\_0p47F.cir}. They were run using LTspice 26.0.1 for Windows. Table~\ref{tab:model} states every electrical assumption relevant to this charging comparison. The 100~k$\Omega$ path approximates the regulator module's EN pull-up current while EN is held low; the manufacturer describes this current as approximately 10~$\mu$A per volt of input \cite{pololu-5712}. Neither the 3.3~V source nor the 1~k$\Omega$ resistance was measured on Masixole's board.
+
+\begin{table}[htbp]
+\centering
+\caption{Assumed LTspice charging model; values are not antenna measurements.}
+\label{tab:model}
+\begin{tabular}{p{0.43\linewidth}p{0.43\linewidth}}
+\toprule
+Element or condition & Value or implementation \\
+\midrule
+Open-circuit source voltage, $V_{\rm OC}$ & 3.3~V DC, assumed \\
+Source resistance, $R_{\rm S}$ & 1~k$\Omega$, assumed \\
+Input bypass, $C_1$ & 10~nF across $V_{\rm STORE}$ \\
+Storage, $C_{\rm STORE}$ & 4700~$\mu$F or 0.47~F, one at a time \\
+Disabled-regulator proxy, $R_{\rm OFF}$ & 100~k$\Omega$ to ground \\
+Initial capacitor voltage & 0~V \\
+RF field and loads & Continuous field; no active converter or output load \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The simulation used transient analysis with an uncharged initial condition. Measurements in the LTspice decks record the first crossings of 3.0~V and 3.1~V, plus selected voltage samples. The 4700~$\mu$F run covered 60~s; the 0.47~F run covered 3600~s. Raw waveforms and simulator logs are saved beside this report.
+
+The linear circuit also permits an independent check. With $C=C_1+C_{\rm STORE}$, the effective resistance, final voltage and time constant are
+\begin{align}
+R_{\rm eq} &= R_{\rm S}\mathbin{\|}R_{\rm OFF}, \\
+V_{\infty} &= V_{\rm OC}\frac{R_{\rm OFF}}{R_{\rm S}+R_{\rm OFF}}=3.2673~\mathrm{V}, \\
+\tau &= R_{\rm eq}C, \\
+V_{\rm STORE}(t) &= V_{\infty}\left(1-\exp\left[-\frac{t}{\tau}\right]\right).
+\end{align}
+Here $t$ is elapsed charging time. The resulting time constants are 4.6535~s and 465.3465~s for the 4700~$\mu$F and 0.47~F cases, respectively. For a threshold $V_T<V_{\infty}$, the calculated crossing time is $t_T=-\tau\ln(1-V_T/V_{\infty})$.
+
+\section{Results and interpretation}
+Table~\ref{tab:results} reports the values extracted from the LTspice logs. The two capacitances differ by approximately a factor of 100, and so do their charging times in this linear model. The equation above reproduces the simulated 3.0~V crossings to within 0.2~ms. This agreement checks the circuit implementation, not the accuracy of the source assumption. The companion plot \texttt{Step\_1\_Charge\_Curves.svg} shows both charging curves on separate time axes.
+
+\begin{table}[htbp]
+\centering
+\caption{Simulated $V_{\rm STORE}$ charging results under the assumed 3.3~V/1~k$\Omega$ source.}
+\label{tab:results}
+\begin{tabular}{p{0.25\linewidth}p{0.19\linewidth}p{0.19\linewidth}p{0.23\linewidth}}
+\toprule
+Storage option & Time to 3.0~V & Time to 3.1~V & Voltage at final sample \\
+\midrule
+4700~$\mu$F & 11.649~s & 13.829~s & 3.267~V at 60~s \\
+0.47~F & 1164.881~s (19.41~min) & 1382.907~s (23.05~min) & 3.266~V at 60~min \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 4700~$\mu$F part is appropriate for a quick source and wiring check, but this result does not show that it can support a display update. The 0.47~F part offers greater stored energy at the cost of a substantially longer charge time. With the assumed 3.3~V open-circuit source, the circuit approaches 3.267~V and can never reach the earlier suggested 3.6~V enable target. A practical enable test must therefore use a threshold that the measured circuit can reach; it must also respect the regulator's 3.0~V start-up requirement \cite{pololu-5712}.
+
+\section{Limits of the simulation}
+The largest uncertainty is the available $V_{\rm EH}$ voltage and current for the actual antenna, tag configuration, reader, separation and orientation. ST documents that this output is not regulated and that energy-harvesting load can affect RF communication \cite{st-an4913}. Consequently, a fixed ideal DC source behind one resistor is only a first-order comparison. The model excludes RF-field interruption, nonlinear tag behaviour, capacitor equivalent series resistance and leakage, possible discharge into the tag, converter start-up and efficiency, and the display's pulsed load. A 100~k$\Omega$ resistor reproduces the approximate EN pull-up current but not every disabled-module behaviour. No KiCad/ngspice replication or physical test has yet been performed.
+
+These limitations prevent a claim that either storage option is suitable for e-paper refresh. They also prevent interpreting the simulated times as procurement or performance guarantees. Both capacitor charging and NFC communication must be observed during the hardware test.
+
+\section{Next breadboard session}
+The first hardware session will begin with the regulator disconnected and no storage capacitor fitted. Masixole will confirm the actual $V_{\rm EH}$ and ground pins against his KiCad nets and check that energy harvesting is enabled. Sergio will record the reader model, antenna configuration, separation and orientation, then measure the open-circuit $V_{\rm EH}$ and repeat the reading with at least two known resistive loads. The loaded measurements will reveal whether 3.0~V is plausible and support a local source estimate. A nonlinear response must not be forced into one fixed-resistance model.
+
+After checking the maximum observed voltage against the capacitor rating, the 10~nF bypass and 4700~$\mu$F storage option will be fitted with correct polarity. The team will record $V_{\rm STORE}(t)$, the 3.0~V crossing if reached, and whether NFC communication remains reliable. The 0.47~F capacitor will be tested in a separate run only after the voltage ceiling is confirmed to be below its 5.5~V rating. The regulator will remain disabled during charging. Its start-up and the 1~k$\Omega$/330~$\Omega$ load tests belong to a later, separately recorded step. These tests must not connect the actual e-paper panel until the output behaviour is understood.
+
+The results to retain are the date and operator, component markings, reader and geometry, jumper states, instrument details, source and storage voltages versus time, communication status, and photographs. The measured curves will replace the assumed source values in the next LTspice and KiCad simulations.
+
+\section{Conclusion}
+The simulated 4700~$\mu$F and 0.47~F capacitors reached the regulator's nominal 3.0~V start threshold after 11.649~s and 19.41~min, respectively, under one assumed, continuously available source. An analytical RC calculation independently corroborated the simulator outputs. The result establishes a reproducible comparison between storage options, but it does not validate the antenna, regulator or display system. Controlled $V_{\rm EH}$ measurements are the necessary next evidence.
+
+\bibliographystyle{IEEEtran}
+\bibliography{Version_1_Charging_Simulation_References}
+\end{document}

@@ -1,0 +1,16 @@
+Version 1 Step 1 - 4700uF charge; ASSUMED source, not measured ST25DV data
+* V_EH model: assumed 3.3 V open-circuit and 1 kohm series resistance
+* U1 disabled: 100 kohm proxy for Pololu EN pull-up current (~10 uA/V)
+* No load, supercapacitor leakage, RF interruption, or converter dynamics
+VVEH SRC 0 DC 3.3
+RSRC SRC VSTORE 1k
+C1 VSTORE 0 10n
+CSTORE VSTORE 0 4700u IC=0
+ROFF VSTORE 0 100k
+.tran 0 60 0 0.02 UIC
+.meas tran T_3V WHEN V(VSTORE)=3.0 RISE=1
+.meas tran T_3P1V WHEN V(VSTORE)=3.1 RISE=1
+.meas tran V_10S FIND V(VSTORE) AT=10
+.meas tran V_60S FIND V(VSTORE) AT=60
+.save V(VSTORE) I(VVEH)
+.end
