@@ -14,8 +14,12 @@
   align-items: end;
 }
 
+.game-heading h1,
 .game-heading h2 {
   margin-bottom: 0;
+  margin-top: .35em;
+  font: 700 clamp(42px, 5.3vw, 76px)/.96 "Space Grotesk", sans-serif;
+  letter-spacing: -.045em;
 }
 
 .game-heading > p {
@@ -831,4 +835,64 @@
 @keyframes roast-fade {
   0%, 100% { opacity: 0; }
   4%, 96% { opacity: 1; transform: none; }
+}
+
+/* Standalone challenge page and champion treatment. */
+.game-page {
+  max-width: 1500px;
+  min-height: calc(100vh - 150px);
+}
+
+.game-page .nfc-game {
+  padding-top: 72px;
+}
+
+.game-page-intro {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+.game-page-intro a {
+  flex: 0 0 auto;
+}
+
+.leaderboard-champion {
+  background: linear-gradient(90deg, rgba(255, 205, 52, .18), rgba(255, 79, 154, .08));
+}
+
+.leaderboard-champion td:first-child {
+  color: #a96c00;
+  font-weight: 900;
+}
+
+.leaderboard-champion td:nth-child(2) {
+  min-width: 150px;
+  text-align: center;
+}
+
+.leaderboard-champion td:nth-child(2) strong {
+  display: block;
+}
+
+.leaderboard-crown {
+  display: block;
+  width: max-content;
+  margin: 0 auto 3px;
+  color: #f2ad00;
+  font-size: 28px;
+  line-height: .8;
+  filter: drop-shadow(0 4px 5px rgba(242, 173, 0, .3));
+  animation: crown-float 1.8s ease-in-out infinite;
+}
+
+@keyframes crown-float {
+  50% { transform: translateY(-4px) rotate(4deg); }
+}
+
+@media (max-width: 720px) {
+  .game-page-intro { align-items: flex-start; flex-direction: column; }
+  .game-page .nfc-game { padding-top: 42px; }
 }

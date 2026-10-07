@@ -220,10 +220,21 @@
 
     scores.forEach((entry, index) => {
       const row = document.createElement("tr");
+      if (index === 0) row.className = "leaderboard-champion";
       const distanceMm = Number(entry.distanceMm ?? Number(entry.distance) * 10);
-      [index + 1, entry.name, entry.score, `${distanceMm.toFixed(0)} mm`, entry.attempts].forEach(value => {
+      [index + 1, entry.name, entry.score, `${distanceMm.toFixed(0)} mm`, entry.attempts].forEach((value, columnIndex) => {
         const cell = document.createElement("td");
-        cell.textContent = String(value);
+        if (index === 0 && columnIndex === 1) {
+          const crown = document.createElement("span");
+          crown.className = "leaderboard-crown";
+          crown.setAttribute("aria-label", "Leaderboard champion");
+          crown.textContent = "♛";
+          const championName = document.createElement("strong");
+          championName.textContent = String(value);
+          cell.append(crown, championName);
+        } else {
+          cell.textContent = String(value);
+        }
         row.appendChild(cell);
       });
       leaderboardBody.appendChild(row);

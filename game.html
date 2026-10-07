@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Play Group 02's SwingTag NFC sweet-spot challenge and join the local leaderboard." />
+  <title>SwingTag NFC Challenge — Group 02</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="enhancements.css" />
+  <link rel="stylesheet" href="game.css" />
+</head>
+<body>
+  <div class="noise"></div>
+
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Back to the SwingTag investigation">
+      <img class="brand-logo" src="assets/swingtag-logo.jpg" alt="SwingTag" />
+      <span><strong>SwingTag</strong><small>Group 02 · Wits Electrical Engineering</small></span>
+    </a>
+    <button id="menuBtn" class="menu-btn" type="button" aria-controls="siteNav" aria-expanded="false">Menu</button>
+    <nav class="nav" id="siteNav">
+      <a href="./#story">Story</a>
+      <a href="./#circuit">Circuit</a>
+      <a href="./#evidence">Evidence</a>
+      <a href="./#lab">Energy Lab</a>
+      <a href="game.html" aria-current="page">NFC Game</a>
+      <a href="./#people">Team</a>
+    </nav>
+    <button id="themeBtn" class="ghost-btn" type="button" aria-label="Toggle colour mode">Colour shift</button>
+  </header>
+
+  <main class="game-page" id="top">
+    <section class="section nfc-game reveal visible">
+      <div class="game-page-intro">
+        <div><div class="section-kicker">STANDALONE INTERACTIVE</div><strong>One game. Two attempts. Infinite bragging rights.</strong></div>
+        <a class="secondary-btn" href="./">← Back to the investigation</a>
+      </div>
+
+      <div class="game-heading">
+        <div><div class="section-kicker">THE NFC SWEET-SPOT CHALLENGE</div><h1>Bring the phone close. Not that close.</h1></div>
+        <p>Help Sergio position the phone relative to the e-paper control system held by Masixole. The current team observation places the target window at approximately <strong>15–20 mm</strong>. Each engineer gets only <strong>two attempts</strong>. Coupling and energy remain hidden until a distance is tested.</p>
+      </div>
+
+      <div class="game-grid">
+        <div class="game-stage" id="gameStage" style="--sergio-left:4%">
+          <div class="nfc-scene" aria-label="Sergio holding a phone opposite Masixole holding the SwingTag e-paper system">
+            <div class="character sergio-character" id="sergioCharacter">
+              <div class="name-flag">Sergio</div>
+              <svg viewBox="0 0 220 260" role="img" aria-label="Cartoon Sergio holding an NFC phone">
+                <circle cx="104" cy="52" r="34" fill="#70422f"/><path d="M72 48c3-30 57-42 70-3-18-9-47-9-70 3Z" fill="#171622"/>
+                <rect x="66" y="88" width="83" height="105" rx="30" fill="#7c3aed"/><path d="M75 112 38 146" stroke="#70422f" stroke-width="18" stroke-linecap="round"/><path d="M140 111 174 131" stroke="#70422f" stroke-width="18" stroke-linecap="round"/>
+                <rect x="168" y="111" width="29" height="55" rx="6" fill="#16151f"/><rect x="172" y="117" width="21" height="38" rx="3" fill="#05c7d9"/><circle cx="182.5" cy="160" r="2.8" fill="#fff"/>
+                <path d="M83 189 75 242M132 189l13 53" stroke="#242231" stroke-width="19" stroke-linecap="round"/>
+              </svg>
+              <span class="object-label">NFC phone</span>
+            </div>
+
+            <div class="field-visual" aria-hidden="true"><i></i><i></i><i></i><b id="fieldSpark">⚡</b></div>
+
+            <div class="character masixole-character">
+              <div class="name-flag">Masixole</div>
+              <svg viewBox="0 0 220 260" role="img" aria-label="Cartoon Masixole holding the SwingTag e-paper controller">
+                <circle cx="112" cy="52" r="34" fill="#5b3528"/><path d="M80 43c9-27 58-34 67 5-23-10-43-11-67-5Z" fill="#101117"/>
+                <rect x="70" y="88" width="86" height="105" rx="30" fill="#ff4f9a"/><path d="M82 112 47 143" stroke="#5b3528" stroke-width="18" stroke-linecap="round"/><path d="M146 111 172 137" stroke="#5b3528" stroke-width="18" stroke-linecap="round"/>
+                <rect x="27" y="125" width="67" height="48" rx="9" fill="#f7f2df" stroke="#171622" stroke-width="6"/><text x="60" y="145" text-anchor="middle" font-size="8" font-family="sans-serif" fill="#7c3aed">SWINGTAG</text><text x="60" y="160" text-anchor="middle" font-size="13" font-weight="700" font-family="sans-serif">R39.99</text>
+                <path d="M88 189 78 242M139 189l12 53" stroke="#242231" stroke-width="19" stroke-linecap="round"/>
+              </svg>
+              <span class="object-label">E-paper tag</span>
+            </div>
+
+            <div class="tag-reveal" id="tagReveal" aria-live="polite" aria-hidden="true">
+              <div class="tag-card-3d"><div class="tag-lanyard" aria-hidden="true"></div><div class="tag-card-face">
+                <span class="tag-brand">SWINGTAG</span><span class="tag-refresh-label">E-PAPER REFRESH COMPLETE</span>
+                <strong id="tagEngineerName">NFC Engineer</strong><span class="tag-award">87%+ COUPLING CHAMPION</span>
+                <div class="tag-nfc-mark" aria-hidden="true"><i></i><i></i><i></i></div>
+              </div><div class="tag-timer"><span></span></div></div>
+            </div>
+
+            <div class="roast-reveal" id="roastReveal" aria-live="assertive" aria-hidden="true">
+              <div class="roast-emoji" aria-hidden="true">😂 🤣 😂</div><strong id="roastHeading">NFC said absolutely not.</strong>
+              <p id="roastCopy">Try moving the phone.</p><span id="roastAttempt">Attempt 1 of 2</span>
+            </div>
+            <div class="distance-ruler" aria-hidden="true"><span>0 mm</span><div class="ruler-line"></div><span>20 mm</span></div>
+          </div>
+        </div>
+
+        <aside class="game-panel">
+          <label class="player-field" for="playerName">Engineer name <span>two attempts per name</span></label>
+          <input id="playerName" class="player-input" type="text" maxlength="18" autocomplete="nickname" placeholder="e.g. NFC Ninja" />
+          <p class="attempt-hint" id="attemptHint">Enter your name to unlock two attempts.</p>
+          <label class="distance-label" for="distanceSlider">Set the phone-to-tag distance</label>
+          <input id="distanceSlider" class="distance-slider" type="range" min="0" max="20" value="10" step="1" />
+          <div class="range-labels"><span>0 mm · hardware cuddle</span><span>20 mm · outer target</span></div>
+          <div class="game-actions"><button id="testDistanceBtn" class="game-primary" type="button">Test this distance</button><button id="resetGameBtn" class="game-secondary" type="button">New round</button></div>
+          <div class="game-result idle" id="gameResult" role="status" aria-live="polite"><span>READY</span><strong>Your result is still classified.</strong><p>Enter a name, choose 0–20 mm and test. Coupling and calculated storage energy will appear afterwards.</p></div>
+          <div class="energy-readout" id="energyReadout" hidden>
+            <div class="energy-title"><span>CALCULATED GAME ESTIMATE</span><strong>What did that attempt harvest?</strong></div>
+            <div class="energy-metrics"><div><span>EST. COUPLING</span><strong id="revealedCoupling">—</strong></div><div><span>EST. STORAGE VOLTAGE</span><strong id="revealedVoltage">—</strong></div><div><span>CALCULATED ENERGY</span><strong id="revealedEnergy">—</strong></div></div>
+            <div class="energy-target" id="energyTarget">Target storage range: 3.3–4.0 V.</div>
+            <div class="did-you-know"><span>DID YOU KNOW?</span><strong id="energyFactTitle">A few millijoules can still do useful work.</strong><ul id="energyFacts"></ul></div>
+            <code>E = ½CV² · C = 4700 µF</code>
+          </div>
+          <p class="game-caveat">Teaching game based on the team's current 15–20 mm observation. Coupling, voltage and energy displayed here are illustrative calculations—not RF measurements. Actual V<sub>EH</sub>, charging time, alignment, losses and update energy must be measured on hardware.</p>
+        </aside>
+      </div>
+
+      <div class="leaderboard-card">
+        <div><div class="section-kicker">LOCAL LEADERBOARD</div><h2>Coupling champions</h2><p>The engineer in first place wears the crown. Scores are stored in this browser; the shared online leaderboard will come later.</p></div>
+        <div class="leaderboard-table-wrap"><table><thead><tr><th>#</th><th>Engineer</th><th>Score</th><th>Distance</th><th>Tries</th></tr></thead><tbody id="leaderboardBody"></tbody></table></div>
+      </div>
+    </section>
+  </main>
+
+  <footer><span>SwingTag · Group 02 · 2026</span><span>NFC sweet-spot challenge · calculations are illustrative</span></footer>
+  <script src="enhancements.js"></script>
+  <script src="game.js"></script>
+  <script>document.getElementById('themeBtn')?.addEventListener('click', () => document.body.classList.toggle('alt'));</script>
+</body>
+</html>

@@ -50,10 +50,10 @@ The 0.47 F capacitor remains on the website only as a historical simulation comp
 
 ## NFC sweet-spot game and leaderboard
 
-The included game asks visitors to position Sergio's NFC phone relative to the e-paper controller held by Masixole. It uses the team's current target window of approximately **15-20 mm**, limits the slider to **0-20 mm**, and allows only two attempts for each locally recorded name. Coupling is revealed only after a test. Incorrect guesses trigger a large animated roast, while successful guesses are scored by attempts and elapsed time.
+The NFC challenge now lives on its own `game.html` page, opened from the main navigation. It asks visitors to position Sergio's NFC phone relative to the e-paper controller held by Masixole. It uses the team's current target window of approximately **15-20 mm**, limits the slider to **0-20 mm**, and allows only two attempts for each locally recorded name. Coupling is revealed only after a test. Incorrect guesses trigger a large animated roast, while successful guesses are scored by attempts and elapsed time.
 
 A successful attempt inside the target window with at least **87% estimated coupling** triggers a ten-second animated 3D e-paper refresh showing the engineer's entered name. Each attempt also shows an illustrative storage-voltage and energy calculation for the 4700 µF capacitor, plus idealised load-runtime comparisons. These values are deliberately labelled as game estimates and must not be reported as measured RF performance or harvested energy.
 
-The leaderboard uses `localStorage`, so it works immediately on GitHub Pages without a backend. Scores are private to each browser/device. A shared public leaderboard for all visitors requires persistent storage such as Supabase, Firebase, or a small Cloudflare Worker with a database. Do not expose service keys in client-side JavaScript.
+The leaderboard uses `localStorage`, so it works immediately on GitHub Pages without a backend. The leading engineer receives a crown above their name. Scores are private to each browser/device. A shared public leaderboard for all visitors requires persistent storage such as Supabase, Firebase, or a small Cloudflare Worker with a database. Do not expose service keys in client-side JavaScript.
 
 The game is educational rather than a substitute for the formal experiment. The investigation must still record the phone/reader model, antenna orientation, exact separation, number of trials, update success and latency.
