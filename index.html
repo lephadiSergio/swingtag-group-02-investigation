@@ -132,7 +132,7 @@
     <section id="evidence" class="section evidence-section reveal">
       <div class="section-kicker">EVIDENCE DESK</div>
       <h2>Open the model. Trace the claim.</h2>
-      <p class="section-intro">The website ships with lightweight LTspice source files and the first charging comparison. Large <code>.raw</code> files remain in the working archive rather than the GitHub Pages bundle.</p>
+      <p class="section-intro">This evidence desk summarises the simulation sequence and the first charging comparison. The underlying LTspice files remain in the team's controlled project archive.</p>
       <div class="evidence-grid">
         <figure class="evidence-plot glass-card">
           <img src="assets/step-1-charge-curves.svg" alt="LTspice charging curves comparing the Version 1 storage capacitors" />
@@ -142,7 +142,6 @@
           <article class="evidence-card"><span>MODEL ARCHIVE</span><strong>Stages 0 → V3B-2</strong><p>The working folder contains source characterisation, storage, regulator, isolation, hysteresis, LTC1540, PMOS-switch and MCU-load simulations.</p></article>
           <article class="evidence-card"><span>BENCH EVIDENCE</span><strong>Discrete supervisor switching demonstrated</strong><p>The breadboard work has shown the sensing-to-switching chain operating. Threshold repeatability, the falling threshold and storage-integrated behaviour still require controlled measurement.</p></article>
           <article class="evidence-card warning"><span>CONNECTING MODEL TO HARDWARE</span><strong>The 4700 µF result is now the relevant comparison</strong><p>The illustrative model predicted about 11.6 s to reach 3.0 V. The present practical observation is approximately 10–15 s. That agreement is encouraging, but it is not validation until the voltage endpoints and NFC test conditions are controlled and repeated.</p></article>
-          <a class="download-card" href="assets/swingtag-ltspice-source-pack.zip" download><span>↓</span><div><strong>Download LTspice source pack</strong><small>ASC, CIR, CSV, SVG, report source and notes · no large RAW files</small></div></a>
         </div>
       </div>
       <div class="stage-index" aria-label="Included simulation stages">
@@ -177,17 +176,11 @@
     <section id="game" class="section nfc-game reveal">
       <div class="game-heading">
         <div><div class="section-kicker">THE NFC SWEET-SPOT CHALLENGE</div><h2>Bring the phone close. Not that close.</h2></div>
-        <p>Help Sergio position the phone relative to the e-paper control system held by Masixole. The current team measurement places the optimal operating window at approximately <strong>1.5–2.0 cm</strong>. Reach at least <strong>87% estimated coupling</strong> inside that window to unlock a personalised 3D tag.</p>
+        <p>Help Sergio position the phone relative to the e-paper control system held by Masixole. The current team observation places the target window at approximately <strong>15–20 mm</strong>. Each engineer gets only <strong>two attempts</strong>. Coupling and energy remain hidden until a distance is tested.</p>
       </div>
 
       <div class="game-grid">
         <div class="game-stage" id="gameStage" style="--sergio-left:4%">
-          <div class="game-hud">
-            <div><span>DISTANCE</span><strong><output id="distanceOutput">7.5</output> cm</strong></div>
-            <div><span>SIGNAL ESTIMATE</span><strong id="signalOutput">58%</strong></div>
-            <div><span>ATTEMPTS</span><strong id="attemptOutput">0</strong></div>
-          </div>
-
           <div class="nfc-scene" aria-label="Sergio holding a phone opposite Masixole holding the SwingTag e-paper system">
             <div class="character sergio-character" id="sergioCharacter">
               <div class="name-flag">Sergio</div>
@@ -227,17 +220,25 @@
               </div>
             </div>
 
-            <div class="distance-ruler" aria-hidden="true"><span>0 cm</span><div class="ruler-line"></div><span>15 cm</span></div>
+            <div class="roast-reveal" id="roastReveal" aria-live="assertive" aria-hidden="true">
+              <div class="roast-emoji" aria-hidden="true">😂 🤣 😂</div>
+              <strong id="roastHeading">NFC said absolutely not.</strong>
+              <p id="roastCopy">Try moving the phone.</p>
+              <span id="roastAttempt">Attempt 1 of 2</span>
+            </div>
+
+            <div class="distance-ruler" aria-hidden="true"><span>0 mm</span><div class="ruler-line"></div><span>20 mm</span></div>
           </div>
         </div>
 
         <aside class="game-panel">
-          <label class="player-field" for="playerName">Engineer name <span>for this device's leaderboard</span></label>
+          <label class="player-field" for="playerName">Engineer name <span>two attempts per name</span></label>
           <input id="playerName" class="player-input" type="text" maxlength="18" autocomplete="nickname" placeholder="e.g. NFC Ninja" />
+          <p class="attempt-hint" id="attemptHint">Enter your name to unlock two attempts.</p>
 
           <label class="distance-label" for="distanceSlider">Set the phone-to-tag distance</label>
-          <input id="distanceSlider" class="distance-slider" type="range" min="0" max="15" value="7.5" step="0.1" />
-          <div class="range-labels"><span>0 cm · almost touching</span><span>15 cm · ambitious</span></div>
+          <input id="distanceSlider" class="distance-slider" type="range" min="0" max="20" value="10" step="1" />
+          <div class="range-labels"><span>0 mm · hardware cuddle</span><span>20 mm · outer target</span></div>
 
           <div class="game-actions">
             <button id="testDistanceBtn" class="game-primary" type="button">Test this distance</button>
@@ -245,9 +246,22 @@
           </div>
 
           <div class="game-result idle" id="gameResult" role="status" aria-live="polite">
-            <span>READY</span><strong>Find the NFC sweet spot.</strong><p>Adjust the slider, then test your distance. The game will explain what the result means.</p>
+            <span>READY</span><strong>Your result is still classified.</strong><p>Enter a name, choose 0–20 mm and test. Coupling and calculated storage energy will appear afterwards.</p>
           </div>
-          <p class="game-caveat">Teaching game based on the team's current measured optimum of approximately 1.5–2.0 cm. The 87% indicator is a game estimate, not a measured RF efficiency. Reader model, antenna orientation and repeatability still belong in the formal test record.</p>
+
+          <div class="energy-readout" id="energyReadout" hidden>
+            <div class="energy-title"><span>CALCULATED GAME ESTIMATE</span><strong>What did that attempt harvest?</strong></div>
+            <div class="energy-metrics">
+              <div><span>EST. COUPLING</span><strong id="revealedCoupling">—</strong></div>
+              <div><span>EST. STORAGE VOLTAGE</span><strong id="revealedVoltage">—</strong></div>
+              <div><span>CALCULATED ENERGY</span><strong id="revealedEnergy">—</strong></div>
+            </div>
+            <div class="energy-target" id="energyTarget">Target storage range: 3.3–4.0 V.</div>
+            <div class="did-you-know"><span>DID YOU KNOW?</span><strong id="energyFactTitle">A few millijoules can still do useful work.</strong><ul id="energyFacts"></ul></div>
+            <code>E = ½CV² · C = 4700 µF</code>
+          </div>
+
+          <p class="game-caveat">Teaching game based on the team's current 15–20 mm observation. Coupling, voltage and energy displayed here are illustrative calculations—not RF measurements. Actual V<sub>EH</sub>, charging time, alignment, losses and update energy must be measured on hardware.</p>
         </aside>
       </div>
 
@@ -285,7 +299,7 @@
     <section class="section final-cta reveal"><div><div class="section-kicker">THE STORY IS STILL BEING WRITTEN</div><h2>Next stop: one complete e-paper update.</h2><p>The site will grow with the investigation. Each new circuit stage, waveform and physical measurement becomes another chapter — including the failures, because they are part of the engineering.</p></div><a class="primary-btn" href="https://dsllab.app/projects/group-02/" target="_blank" rel="noreferrer">Project page ↗</a></section>
   </main>
 
-  <footer><span>SwingTag · Group 02 · 2026</span><span>Living engineering record · updated 6 October 2026</span></footer>
+  <footer><span>SwingTag · Group 02 · 2026</span><span>Living engineering record · updated 7 October 2026</span></footer>
   <script src="script.js"></script>
   <script src="enhancements.js"></script>
   <script src="game.js"></script>

@@ -9,8 +9,7 @@ This version uses plain HTML, CSS and JavaScript so it can be hosted directly on
 
 - `assets/swingtag-logo.jpg` - supplied SwingTag logo.
 - `assets/step-1-charge-curves.svg` - Version 1 charging comparison from the simulation workspace.
-- `assets/swingtag-ltspice-source-pack.zip` - lightweight LTspice sources and notes for download.
-- `assets/ltspice-source/` - readable source files used to build the downloadable pack.
+- `assets/ltspice-source/` - project simulation sources retained in the repository for team traceability; the public webpage does not offer them as a download.
 
 Large LTspice `.raw` and `.db` files are deliberately excluded from the website bundle. They remain in the engineering working archive because they are not useful to ordinary site visitors and would make the GitHub repository unnecessarily large.
 
@@ -51,9 +50,9 @@ The 0.47 F capacitor remains on the website only as a historical simulation comp
 
 ## NFC sweet-spot game and leaderboard
 
-The included game asks visitors to position Sergio's NFC phone relative to the e-paper controller held by Masixole. It uses the team's current measured optimum of approximately **1.5-2.0 cm** and limits guesses to **0-15 cm**. Incorrect guesses receive light-hearted feedback, while successful guesses are scored by attempts and elapsed time.
+The included game asks visitors to position Sergio's NFC phone relative to the e-paper controller held by Masixole. It uses the team's current target window of approximately **15-20 mm**, limits the slider to **0-20 mm**, and allows only two attempts for each locally recorded name. Coupling is revealed only after a test. Incorrect guesses trigger a large animated roast, while successful guesses are scored by attempts and elapsed time.
 
-A successful attempt inside the measured window with at least **87% estimated coupling** triggers a ten-second animated 3D e-paper refresh showing the engineer's entered name. The percentage is deliberately labelled as a game estimate and must not be reported as measured RF efficiency.
+A successful attempt inside the target window with at least **87% estimated coupling** triggers a ten-second animated 3D e-paper refresh showing the engineer's entered name. Each attempt also shows an illustrative storage-voltage and energy calculation for the 4700 µF capacitor, plus idealised load-runtime comparisons. These values are deliberately labelled as game estimates and must not be reported as measured RF performance or harvested energy.
 
 The leaderboard uses `localStorage`, so it works immediately on GitHub Pages without a backend. Scores are private to each browser/device. A shared public leaderboard for all visitors requires persistent storage such as Supabase, Firebase, or a small Cloudflare Worker with a database. Do not expose service keys in client-side JavaScript.
 
