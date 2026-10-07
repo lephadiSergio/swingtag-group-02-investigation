@@ -54,6 +54,8 @@ The NFC challenge now lives on its own `game.html` page, opened from the main na
 
 A successful attempt inside the target window with at least **87% estimated coupling** triggers a ten-second animated 3D e-paper refresh showing the engineer's entered name. Each attempt also shows an illustrative storage-voltage and energy calculation for the 4700 µF capacitor, plus idealised load-runtime comparisons. These values are deliberately labelled as game estimates and must not be reported as measured RF performance or harvested energy.
 
+Failed attempts now trigger a full-screen animated roast. A perfect **100/100** score opens the supplied Joka-nice celebration video in a full-screen dialog with a personalised Masixole Jokanisi catchphrase. The visitor can pause the video or close the celebration using the close button, backdrop or Escape key.
+
 The leaderboard uses `localStorage`, so it works immediately on GitHub Pages without a backend. The leading engineer receives a crown above their name. Scores are private to each browser/device. A shared public leaderboard for all visitors requires persistent storage such as Supabase, Firebase, or a small Cloudflare Worker with a database. Do not expose service keys in client-side JavaScript.
 
 The game is educational rather than a substitute for the formal experiment. The investigation must still record the phone/reader model, antenna orientation, exact separation, number of trials, update success and latency.

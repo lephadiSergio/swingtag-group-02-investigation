@@ -21,6 +21,10 @@
   const energyTarget = document.getElementById("energyTarget");
   const energyFactTitle = document.getElementById("energyFactTitle");
   const energyFacts = document.getElementById("energyFacts");
+  const perfectScoreReveal = document.getElementById("perfectScoreReveal");
+  const perfectScoreName = document.getElementById("perfectScoreName");
+  const perfectScoreVideo = document.getElementById("perfectScoreVideo");
+  const perfectScoreClose = document.getElementById("perfectScoreClose");
 
   if (!slider || !testButton || !leaderboardBody) return;
 
@@ -305,7 +309,7 @@
   function hideRoast() {
     if (roastTimer) window.clearTimeout(roastTimer);
     roastTimer = null;
-    stage.classList.remove("roast-showcase");
+    document.body.classList.remove("roast-showcase");
     roastReveal.setAttribute("aria-hidden", "true");
   }
 
@@ -317,8 +321,31 @@
     roastCopy.textContent = copy;
     roastAttempt.textContent = used >= MAX_ATTEMPTS ? "Both attempts used" : `Attempt ${used} of ${MAX_ATTEMPTS}`;
     roastReveal.setAttribute("aria-hidden", "false");
-    stage.classList.add("roast-showcase");
+    document.body.classList.add("roast-showcase");
     roastTimer = window.setTimeout(hideRoast, ROAST_REVEAL_MS);
+  }
+
+  function hidePerfectScore() {
+    if (!perfectScoreReveal) return;
+    perfectScoreReveal.hidden = true;
+    perfectScoreReveal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("perfect-score-showcase");
+    if (perfectScoreVideo) {
+      perfectScoreVideo.pause();
+      perfectScoreVideo.currentTime = 0;
+    }
+  }
+
+  function showPerfectScore(name) {
+    if (!perfectScoreReveal || !perfectScoreName) return;
+    perfectScoreName.textContent = name;
+    perfectScoreReveal.hidden = false;
+    perfectScoreReveal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("perfect-score-showcase");
+    perfectScoreClose?.focus();
+    perfectScoreVideo?.play().catch(() => {
+      // Autoplay policies may require the visitor to press play; controls stay visible.
+    });
   }
 
   function testDistance() {
@@ -358,6 +385,7 @@
       void stage.offsetWidth;
       stage.classList.add("celebrate");
       showTagReveal(name);
+      if (score === 100) showPerfectScore(name);
       refreshAttemptState();
       return;
     }
@@ -383,6 +411,7 @@
     stage.classList.remove("celebrate");
     hideTagReveal();
     hideRoast();
+    hidePerfectScore();
     energyReadout.hidden = true;
     fieldSpark.textContent = "?";
     setResult("idle", "READY", "Your result is still classified.", "Choose 0–20 mm and test. Coupling and calculated storage energy appear only after the attempt.");
@@ -398,6 +427,13 @@
   });
   testButton.addEventListener("click", testDistance);
   resetButton.addEventListener("click", resetRound);
+  perfectScoreClose?.addEventListener("click", hidePerfectScore);
+  perfectScoreReveal?.addEventListener("click", event => {
+    if (event.target === perfectScoreReveal) hidePerfectScore();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !perfectScoreReveal?.hidden) hidePerfectScore();
+  });
   updateScene();
   refreshAttemptState();
   renderLeaderboard();
