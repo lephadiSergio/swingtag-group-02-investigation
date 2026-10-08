@@ -207,35 +207,83 @@
 }
 
 .tag-reveal {
-  position: absolute;
-  z-index: 8;
+  position: fixed;
+  z-index: 1050;
   inset: 0;
   display: grid;
+  grid-template-rows: auto 1fr;
   place-items: center;
-  padding: 32px;
+  gap: clamp(18px, 4vh, 42px);
+  padding: clamp(28px, 6vw, 80px);
+  overflow-y: auto;
   pointer-events: none;
   perspective: 1100px;
   visibility: hidden;
   opacity: 0;
-  background: radial-gradient(circle, rgba(255,255,255,.88), rgba(237,229,255,.76) 48%, rgba(23,22,34,.28));
+  color: #fff;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255,79,154,.8), transparent 38%),
+    radial-gradient(circle at 82% 82%, rgba(5,199,217,.65), transparent 40%),
+    linear-gradient(135deg, #6d28d9, #171622 68%);
+  backdrop-filter: blur(14px);
   transition: opacity .28s ease, visibility .28s ease;
 }
 
 .tag-showcase .tag-reveal {
   visibility: visible;
   opacity: 1;
+  pointer-events: auto;
 }
 
-.tag-showcase .character,
-.tag-showcase .field-visual,
-.tag-showcase .distance-ruler {
-  filter: blur(4px);
-  opacity: .18;
+body.tag-showcase { overflow: hidden; }
+
+.tag-celebration-copy {
+  z-index: 3;
+  align-self: end;
+  max-width: 800px;
+  text-align: center;
+}
+
+.tag-celebration-copy span {
+  color: #b6f36b;
+  font-size: clamp(10px, 1.3vw, 14px);
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.tag-celebration-copy p {
+  margin: 10px 0 0;
+  color: rgba(255,255,255,.82);
+  font-size: clamp(14px, 2vw, 20px);
+}
+
+.tag-reveal-close {
+  position: fixed;
+  z-index: 6;
+  top: clamp(14px, 3vw, 28px);
+  right: clamp(14px, 3vw, 28px);
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255,255,255,.35);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(0,0,0,.25);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tag-reveal-close:hover,
+.tag-reveal-close:focus-visible {
+  background: var(--pink);
+  outline: 3px solid rgba(255,255,255,.72);
 }
 
 .tag-card-3d {
   position: relative;
-  width: min(390px, 83%);
+  align-self: start;
+  width: min(760px, 82vw);
+  max-height: 58vh;
   aspect-ratio: 1.58;
   transform-style: preserve-3d;
   transform: rotateX(14deg) rotateY(-23deg) translateY(28px) scale(.65);
@@ -317,7 +365,7 @@
   z-index: 2;
   max-width: 82%;
   margin: 5px 0 15px;
-  font: 700 clamp(25px, 4vw, 42px)/1 "Space Grotesk", sans-serif;
+  font: 700 clamp(30px, 5vw, 68px)/1 "Space Grotesk", sans-serif;
   overflow-wrap: anywhere;
 }
 .tag-award { color: var(--pink); font-size: 9px; }
@@ -618,7 +666,8 @@
   .masixole-character { right: 0; }
   .field-visual { top: 115px; right: 22%; transform: scale(.75); }
   .distance-ruler { right: 12%; left: 12%; }
-  .tag-reveal { padding: 20px; }
+  .tag-reveal { gap: 26px; padding: 70px 20px 28px; }
+  .tag-card-3d { width: min(500px, 88vw); }
   .tag-card-face { padding: 25px 26px; }
   .tag-card-face strong { max-width: 76%; font-size: 26px; }
   .game-actions { grid-template-columns: 1fr; }

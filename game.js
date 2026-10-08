@@ -10,6 +10,7 @@
   const leaderboardBody = document.getElementById("leaderboardBody");
   const tagReveal = document.getElementById("tagReveal");
   const tagEngineerName = document.getElementById("tagEngineerName");
+  const tagRevealClose = document.getElementById("tagRevealClose");
   const roastReveal = document.getElementById("roastReveal");
   const roastHeading = document.getElementById("roastHeading");
   const roastCopy = document.getElementById("roastCopy");
@@ -293,7 +294,7 @@
   function hideTagReveal() {
     if (revealTimer) window.clearTimeout(revealTimer);
     revealTimer = null;
-    stage.classList.remove("tag-showcase");
+    document.body.classList.remove("tag-showcase");
     tagReveal.setAttribute("aria-hidden", "true");
   }
 
@@ -302,7 +303,8 @@
     hideTagReveal();
     tagEngineerName.textContent = name;
     tagReveal.setAttribute("aria-hidden", "false");
-    stage.classList.add("tag-showcase");
+    document.body.classList.add("tag-showcase");
+    tagRevealClose?.focus();
     revealTimer = window.setTimeout(hideTagReveal, TAG_REVEAL_MS);
   }
 
@@ -427,12 +429,18 @@
   });
   testButton.addEventListener("click", testDistance);
   resetButton.addEventListener("click", resetRound);
+  tagRevealClose?.addEventListener("click", hideTagReveal);
+  tagReveal?.addEventListener("click", event => {
+    if (event.target === tagReveal) hideTagReveal();
+  });
   perfectScoreClose?.addEventListener("click", hidePerfectScore);
   perfectScoreReveal?.addEventListener("click", event => {
     if (event.target === perfectScoreReveal) hidePerfectScore();
   });
   document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && !perfectScoreReveal?.hidden) hidePerfectScore();
+    if (event.key !== "Escape") return;
+    if (!perfectScoreReveal?.hidden) hidePerfectScore();
+    else if (tagReveal.getAttribute("aria-hidden") === "false") hideTagReveal();
   });
   updateScene();
   refreshAttemptState();
