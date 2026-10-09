@@ -26,35 +26,40 @@
   }
 
   function initFlow(){
-    const track=document.querySelector("#flowTrack"); if(!track)return;
-    const dots=document.querySelector("#stageDots"), fill=document.querySelector("#flowFill"), voltage=document.querySelector("#flowVoltage"), rail=document.querySelector("#flowRail"), status=document.querySelector("#flowStatus"), orb=document.querySelector("#monitorOrb"), copy=document.querySelector("#monitorCopy"), update=document.querySelector("#updateTag");
-    const messages=["Max and Sergio are approaching the tag.","The phone field is coupling into the antenna.","The ST25 is producing harvested output.","The 4700 µF reservoir is accumulating energy.","The threshold monitor is checking VSTORE.","The buck-boost converter is establishing 3.3 V.","The STM32 and e-paper are ready to update."];
-    dots.innerHTML=Array.from({length:7},(_,i)=>`<button type="button" aria-label="Show stage ${i+1}" data-dot="${i}"></button>`).join("");
-    let start=performance.now(), raf=0, energyReady=false;
+    const stageRoot=document.querySelector("#flowStage"); if(!stageRoot)return;
+    const C=0.0047, THRESHOLD_VOLTAGE=2.8, REQUIRED_UPDATE_ENERGY=21.0;
+    const fill=document.querySelector("#flowFill"), voltage=document.querySelector("#flowVoltage"), percent=document.querySelector("#flowPercent"), stored=document.querySelector("#storedEnergy"), budgetStored=document.querySelector("#budgetStored"), meter=document.querySelector("#energyMeterFill"), rail=document.querySelector("#flowRail"), status=document.querySelector("#flowStatus"), orb=document.querySelector("#monitorOrb"), copy=document.querySelector("#monitorCopy"), thresholdVoltage=document.querySelector("#thresholdVoltage"), thresholdBar=document.querySelector("#thresholdBar"), voltageCondition=document.querySelector("#voltageCondition"), energyCondition=document.querySelector("#energyCondition"), regInput=document.querySelector("#regInput"), regOutput=document.querySelector("#regOutput"), regBox=document.querySelector(".regulator-box"), mcu=document.querySelector("#mcuBox"), epaper=document.querySelector("#flowEpaper"), epaperText=document.querySelector("#epaperText"), updateCopy=document.querySelector("#updateCopy"), pendingBox=document.querySelector("#pendingUpdate");
+    document.querySelector("#requiredEnergy").textContent=REQUIRED_UPDATE_ENERGY.toFixed(1);
+    let start=performance.now(), raf=0, pending=null, successShown=false;
     const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const thresholds=[0,1100,2300,3400,8300,9500,10500];
+    function closeReveal(){const r=document.querySelector("#successReveal");r.classList.remove("show");r.setAttribute("aria-hidden","true");}
+    function revealSuccess(){if(successShown||!pending)return;successShown=true;document.querySelector("#tagMessage").textContent=`${pending.name}, ${pending.compliment}!`;const r=document.querySelector("#successReveal");r.classList.add("show");r.setAttribute("aria-hidden","false");}
     function paint(now){
-      const elapsed=reduced?11000:Math.min(now-start,11600);
-      let stage=thresholds.filter(t=>elapsed>=t).length-1; stage=Math.max(0,Math.min(6,stage));
-      const v=Math.min(3.2,Math.max(0,(elapsed-2500)/6500*3.2)); energyReady=v>=2.8;
-      track.style.transform=`translateX(-${stage*100}%)`;
-      dots.querySelectorAll("button").forEach((b,i)=>b.classList.toggle("active",i===stage));
-      fill.style.height=`${Math.min(100,v/3.2*100)}%`; voltage.textContent=`${v.toFixed(1)} V`;
-      status.textContent=messages[stage]; rail.textContent=energyReady?`${v.toFixed(1)} V · LOAD ENABLED`:`${v.toFixed(1)} V · LOAD OFF`;
-      orb.textContent=energyReady?"ON":"OFF"; orb.classList.toggle("on",energyReady);
-      copy.textContent=energyReady?"Power path enabled. Stored energy may now be released to the regulator.":"Waiting for sufficient energy. Regulator and load remain disabled below 2.8 V.";
-      update.disabled=!energyReady; update.textContent=energyReady?"Update the e-paper":"Waiting for energy…";
-      if(elapsed<11600)raf=requestAnimationFrame(paint);
+      const elapsed=reduced?15600:Math.min(now-start,16000), charge=Math.max(0,elapsed-4500);
+      const v=charge<=6500?2.8*Math.min(1,charge/6500):2.8+.4*Math.min(1,(charge-6500)/2500);
+      const energy=.5*C*v*v*1000, voltageReady=v>=THRESHOLD_VOLTAGE-.001, energyReady=energy>=REQUIRED_UPDATE_ENERGY, powerOn=voltageReady&&energyReady;
+      let stage=elapsed<1500?1:elapsed<3000?2:elapsed<4500?3:!voltageReady?4:!energyReady?5:elapsed<14000?6:7;
+      document.querySelectorAll("[data-flow-card]").forEach(card=>{const n=Number(card.dataset.flowCard);card.classList.toggle("active",n===stage);card.classList.toggle("complete",n<stage);});
+      document.querySelectorAll(".energy-link").forEach((link,i)=>{const allowed=i<3?stage>=i+2:i===3?voltageReady:i>=4?powerOn:false;link.classList.toggle("on",allowed);});
+      fill.style.height=`${v/3.2*100}%`;percent.textContent=`${Math.round(v/3.2*100)}%`;voltage.textContent=`${v.toFixed(2)} V`;thresholdVoltage.textContent=`${v.toFixed(2)} V`;thresholdBar.style.width=`${v/3.2*100}%`;stored.textContent=`${energy.toFixed(1)} mJ`;budgetStored.textContent=energy.toFixed(1);meter.style.width=`${Math.min(100,energy/(.5*C*3.2*3.2*1000)*100)}%`;
+      voltageCondition.textContent=`${voltageReady?'✓':'○'} VSTORE ≥ 2.8 V`;energyCondition.textContent=`${energyReady?'✓':'○'} Stored energy ≥ update requirement`;voltageCondition.classList.toggle("met",voltageReady);energyCondition.classList.toggle("met",energyReady);
+      orb.classList.toggle("on",powerOn);stageRoot.classList.toggle("power-on",powerOn);regBox.classList.toggle("on",powerOn);
+      if(!voltageReady){orb.textContent="OFF · CHARGING";copy.textContent="Waiting for sufficient stored voltage.";}else if(!energyReady){orb.textContent="THRESHOLD REACHED";copy.textContent="Voltage condition passed. Not enough stored energy yet—keep charging.";}else{orb.textContent="POWER PATH ENABLED";copy.textContent="Both voltage and stored-energy conditions passed.";}
+      regInput.textContent=powerOn?`INPUT: VSTORE ${v.toFixed(2)} V`:"INPUT: OFF";regOutput.textContent=powerOn?"OUTPUT: 3.3 V":"OUTPUT: OFF";rail.textContent=powerOn?"3.3 V":"OFF";
+      mcu.innerHTML=powerOn&&stage>=7?"STM32<br><b>BOOTING</b>":"STM32<br><b>OFF</b>";epaperText.textContent=powerOn&&stage>=7?(pending?"REFRESHING":"READY"):"WAITING";updateCopy.textContent=powerOn&&stage>=7?(pending?"3.3 V rail active → STM32 boot → display data prepared → e-paper refresh.":"Energy conditions passed. No visitor update is queued."):"The card remains inactive until both voltage and energy conditions are satisfied.";
+      epaper.classList.toggle("refresh",Boolean(powerOn&&stage>=7&&pending));
+      status.textContent=stage===1?"NFC field detected. Energy is being coupled into the SwingTag antenna.":stage===2?"The passive antenna is receiving coupled NFC energy.":stage===3?"The ST25 is harvesting RF energy.":stage===4?"VSTORE is below 2.8 V. Harvested energy is charging the 4700 µF reservoir.":stage===5?"Threshold reached. Checking available energy for the requested display update.":stage===6?"Enough energy is available. Buck-boost regulator active; output stabilised at 3.3 V.":pending?"STM32 powered. Updating the e-paper display.":"Power is available, but no e-paper update is queued.";
+      if(stage===7&&pending&&elapsed>15400){epaperText.textContent="UPDATE SUCCESSFUL";status.textContent="SwingTag update completed successfully.";revealSuccess();}
+      if(elapsed<16000)raf=requestAnimationFrame(paint);
     }
-    function replay(offset=0){cancelAnimationFrame(raf);start=performance.now()-offset;raf=requestAnimationFrame(paint);}
-    document.querySelector("#replayFlow").addEventListener("click",()=>replay());
-    dots.addEventListener("click",e=>{const b=e.target.closest("button");if(b)replay(thresholds[Number(b.dataset.dot)]);});
+    function replay(){cancelAnimationFrame(raf);closeReveal();successShown=false;epaper.classList.remove("refresh");start=performance.now();raf=requestAnimationFrame(paint);}
+    document.querySelector("#replayFlow").addEventListener("click",replay);
     document.querySelector("#nameForm").addEventListener("submit",e=>{
-      e.preventDefault(); if(!energyReady)return; const name=escText(document.querySelector("#visitorName").value); if(!name)return;
-      document.querySelector("#tagMessage").textContent=`${name}, ${nextCompliment()}!`;
-      const reveal=document.querySelector("#successReveal"); reveal.classList.add("show"); reveal.setAttribute("aria-hidden","false");
+      e.preventDefault();const name=escText(document.querySelector("#visitorName").value);if(!name)return;pending={name,compliment:nextCompliment()};pendingBox.querySelector("span").textContent="UPDATE QUEUED — HARVESTING ENERGY…";pendingBox.querySelector("strong").textContent=`Pending e-paper update: ${name.toUpperCase()} — “${pending.compliment}.”`;replay();stageRoot.scrollIntoView({behavior:"smooth",block:"start"});
     });
-    document.querySelector("#closeReveal").addEventListener("click",()=>{const r=document.querySelector("#successReveal");r.classList.remove("show");r.setAttribute("aria-hidden","true");replay();});
+    document.querySelector("#closeReveal").addEventListener("click",closeReveal);
+    document.querySelector("#replaySuccess").addEventListener("click",replay);
+    document.querySelector("#anotherName").addEventListener("click",()=>{closeReveal();pending=null;pendingBox.querySelector("span").textContent="NO UPDATE QUEUED";pendingBox.querySelector("strong").textContent="Enter a name to prepare the next e-paper message.";const input=document.querySelector("#visitorName");input.value="";document.querySelector(".queue-lab").scrollIntoView({behavior:"smooth"});input.focus();});
     replay();
   }
 
