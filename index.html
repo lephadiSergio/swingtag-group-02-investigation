@@ -100,7 +100,85 @@
     <section id="circuit" class="section dark-panel reveal">
       <div class="section-kicker">THE SYSTEM</div>
       <h2>Follow the energy</h2>
-      <p class="section-intro">Click each block. The page reveals what that part does and why it was added.</p>
+      <p class="section-intro">Watch the complete power path, then open the component blocks to see why each stage was added.</p>
+
+      <div class="power-story" id="powerStory" data-phase="coupling">
+        <div class="power-story-head">
+          <div>
+            <span class="power-story-label">CONCEPTUAL POWER-FLOW ANIMATION</span>
+            <strong>Phone field → harvested energy → stored energy → controlled 3.3 V update</strong>
+          </div>
+          <button class="power-replay" id="powerReplay" type="button">Replay energy flow</button>
+        </div>
+
+        <div class="power-path-scroll" aria-label="Animated NFC energy-harvesting power path">
+          <div class="power-path-track">
+            <article class="power-block phone-block is-active" data-flow-step="1">
+              <span class="power-step">01 · NFC SOURCE</span>
+              <div class="phone-field-visual" aria-hidden="true"><div class="mini-phone"><i></i></div><div class="field-arcs"><i></i><i></i><i></i></div></div>
+              <strong>Phone + NFC field</strong>
+              <small>The phone creates the 13.56 MHz magnetic field.</small>
+            </article>
+            <div class="power-link link-rf" aria-hidden="true"><i></i><i></i><i></i></div>
+
+            <article class="power-block antenna-block" data-flow-step="2">
+              <span class="power-step">02 · PASSIVE PICKUP</span>
+              <div class="mini-coil" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <strong>NFC antenna</strong>
+              <small>The passive coil receives energy inductively.</small>
+            </article>
+            <div class="power-link" aria-hidden="true"><i></i><i></i><i></i></div>
+
+            <article class="power-block st25-block" data-flow-step="3">
+              <span class="power-step">03 · HARVEST</span>
+              <div class="mini-chip" aria-hidden="true"><b>ST25</b><i></i><i></i><i></i><i></i></div>
+              <strong>ST25 harvester</strong>
+              <small>Converts coupled RF energy into the V<sub>EH</sub> output.</small>
+            </article>
+            <div class="power-link" aria-hidden="true"><i></i><i></i><i></i></div>
+
+            <article class="power-block storage-block" data-flow-step="4">
+              <span class="power-step">04 · STORE</span>
+              <div class="reservoir" aria-label="Animated storage-capacitor charge level"><div class="reservoir-fill" id="reservoirFill"></div><span id="reservoirPercent">0%</span></div>
+              <strong>4700 µF reservoir</strong>
+              <small>Energy storage capacitor at <b>VSTORE</b> — not a battery.</small>
+            </article>
+            <div class="power-link controlled-link" aria-hidden="true"><i></i><i></i><i></i></div>
+
+            <article class="power-block monitor-block" data-flow-step="5">
+              <span class="power-step">05 · DECIDE</span>
+              <div class="threshold-gauge"><span>VSTORE</span><strong id="vstoreReadout">0.20 V</strong><div><i id="thresholdNeedle"></i><b></b></div></div>
+              <div class="switch-state" id="switchState"><i></i><span>OFF · CHARGING</span></div>
+              <strong>Threshold + switch</strong>
+              <small>Load stays OFF until <b>VSTORE ≥ 2.8 V</b>.</small>
+            </article>
+            <div class="power-link load-link" aria-hidden="true"><i></i><i></i><i></i></div>
+
+            <article class="power-block regulator-block" data-flow-step="6">
+              <span class="power-step">06 · REGULATE</span>
+              <div class="regulator-visual"><span>varying input</span><b>⇢</b><strong>3.3 V</strong></div>
+              <strong>Buck-boost regulator</strong>
+              <small>Produces a stable 3.3 V rail from changing VSTORE.</small>
+            </article>
+            <div class="power-link load-link" aria-hidden="true"><i></i><i></i><i></i></div>
+
+            <article class="power-block output-block" data-flow-step="7">
+              <span class="power-step">07 · UPDATE</span>
+              <div class="output-visual"><div class="mcu-box">STM32</div><div class="epaper-mini"><span>SWINGTAG</span><strong>R 39.99</strong></div></div>
+              <strong>MCU + e-paper</strong>
+              <small>The regulated rail powers one useful display update.</small>
+            </article>
+          </div>
+        </div>
+
+        <div class="power-status" aria-live="polite">
+          <div><span>LIVE STATE</span><strong id="powerStatusText">Phone approaching: waiting for inductive coupling.</strong></div>
+          <div class="rail-readout"><span>REGULATED OUTPUT</span><strong id="railReadout">OFF</strong></div>
+        </div>
+        <p class="power-story-note"><strong>Design explainer—not a measurement.</strong> The 2.8 V value is the current conceptual enable condition for this animation. Final turn-on, turn-off, V<sub>EH</sub>, conversion efficiency and update energy must be verified on hardware. The separate 3.165 V / 2.885 V values below remain LTspice simulation results.</p>
+      </div>
+
+      <p class="component-explainer-intro">Open each component block for the engineering detail:</p>
       <div class="system-flow" id="systemFlow">
         <button class="flow-node active" data-key="nfc">NFC / V<sub>EH</sub></button><span>→</span>
         <button class="flow-node" data-key="store">C<sub>STORE</sub></button><span>→</span>
@@ -201,7 +279,7 @@
     <section class="section final-cta reveal"><div><div class="section-kicker">THE STORY IS STILL BEING WRITTEN</div><h2>Next stop: one complete e-paper update.</h2><p>The site will grow with the investigation. Each new circuit stage, waveform and physical measurement becomes another chapter — including the failures, because they are part of the engineering.</p></div><a class="primary-btn" href="https://dsllab.app/projects/group-02/" target="_blank" rel="noreferrer">Project page ↗</a></section>
   </main>
 
-  <footer><span>SwingTag · Group 02 · 2026</span><span>Living engineering record · updated 7 October 2026</span></footer>
+  <footer><span>SwingTag · Group 02 · 2026</span><span>Living engineering record · updated 9 October 2026</span></footer>
   <script src="script.js"></script>
   <script src="enhancements.js"></script>
 </body>

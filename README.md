@@ -36,6 +36,8 @@ You can also drag this folder into Netlify Drop, or connect the GitHub repositor
 ## Content integrity
 The site deliberately labels the difference between measured results, simulation results and assumed screening parameters. Do not change assumed values into measured claims unless supported by laboratory evidence.
 
+The system section includes a conceptual animated NFC power path: phone field → passive antenna → ST25 energy harvester → 4700 µF storage capacitor → threshold-controlled switch → 3.3 V buck-boost rail → STM32 and e-paper. Its **2.8 V enable condition is a design explainer, not a measured threshold**; the separately stated 3.165 V and 2.885 V values remain LTspice simulation results.
+
 The current prototype uses a **4700 µF capacitor**. Its displayed **10-15 s charge window** is a practical observation. Before it is promoted to a final measured result, record the initial and final voltage, NFC reader, distance, alignment, number of repeats and uncertainty.
 
 The 0.47 F capacitor remains on the website only as a historical simulation comparison. It is not the currently selected breadboard storage component. The central physical test is whether energy accumulated in the 4700 µF capacitor can pass through the switching and regulation stages and complete one reliable STM32/e-paper update.
