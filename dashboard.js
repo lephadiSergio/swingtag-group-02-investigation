@@ -30,13 +30,16 @@
     const C=0.0047, THRESHOLD_VOLTAGE=2.8, REQUIRED_UPDATE_ENERGY=21.0;
     const flowScroller=document.querySelector("#mobileFlowTrack"), fill=document.querySelector("#flowFill"), voltage=document.querySelector("#flowVoltage"), percent=document.querySelector("#flowPercent"), stored=document.querySelector("#storedEnergy"), budgetStored=document.querySelector("#budgetStored"), meter=document.querySelector("#energyMeterFill"), rail=document.querySelector("#flowRail"), status=document.querySelector("#flowStatus"), orb=document.querySelector("#monitorOrb"), copy=document.querySelector("#monitorCopy"), thresholdVoltage=document.querySelector("#thresholdVoltage"), thresholdBar=document.querySelector("#thresholdBar"), voltageCondition=document.querySelector("#voltageCondition"), energyCondition=document.querySelector("#energyCondition"), regInput=document.querySelector("#regInput"), regOutput=document.querySelector("#regOutput"), regBox=document.querySelector(".regulator-box"), mcu=document.querySelector("#mcuBox"), epaper=document.querySelector("#flowEpaper"), epaperText=document.querySelector("#epaperText"), updateCopy=document.querySelector("#updateCopy"), pendingBox=document.querySelector("#pendingUpdate");
     document.querySelector("#requiredEnergy").textContent=REQUIRED_UPDATE_ENERGY.toFixed(1);
-    let start=performance.now(), raf=0, pending=null, successShown=false, lastMobileStage=0;
+    let start=performance.now(), raf=0, pending=null, successShown=false, failureShown=false, weakAttempt=false, lastMobileStage=0;
     const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;
     function closeReveal(){const r=document.querySelector("#successReveal");r.classList.remove("show");r.setAttribute("aria-hidden","true");}
+    function closeFailure(){const r=document.querySelector("#energyFailure");r.classList.remove("show");r.setAttribute("aria-hidden","true");}
     function revealSuccess(){if(successShown||!pending)return;successShown=true;document.querySelector("#tagMessage").textContent=`${pending.name}, ${pending.compliment}!`;const r=document.querySelector("#successReveal");r.classList.add("show");r.setAttribute("aria-hidden","false");}
+    function revealFailure(v,energy){if(failureShown)return;failureShown=true;document.querySelector("#failureReason").textContent=`VSTORE reached only ${v.toFixed(2)} V with ${energy.toFixed(1)} mJ stored. This attempt needed at least ${THRESHOLD_VOLTAGE.toFixed(1)} V and ${REQUIRED_UPDATE_ENERGY.toFixed(1)} mJ.`;const r=document.querySelector("#energyFailure");r.classList.add("show");r.setAttribute("aria-hidden","false");}
     function paint(now){
       const elapsed=reduced?15600:Math.min(now-start,16000), charge=Math.max(0,elapsed-4500);
-      const v=charge<=6500?2.8*Math.min(1,charge/6500):2.8+.4*Math.min(1,(charge-6500)/2500);
+      const peakVoltage=weakAttempt?2.55:3.2;
+      const v=weakAttempt?peakVoltage*Math.min(1,charge/6500):charge<=6500?2.8*Math.min(1,charge/6500):2.8+.4*Math.min(1,(charge-6500)/2500);
       const energy=.5*C*v*v*1000, voltageReady=v>=THRESHOLD_VOLTAGE-.001, energyReady=energy>=REQUIRED_UPDATE_ENERGY, powerOn=voltageReady&&energyReady;
       let stage=elapsed<1500?1:elapsed<3000?2:elapsed<4500?3:!voltageReady?4:!energyReady?5:elapsed<14000?6:7;
       document.querySelectorAll("[data-flow-card]").forEach(card=>{const n=Number(card.dataset.flowCard);card.classList.toggle("active",n===stage);card.classList.toggle("complete",n<stage);});
@@ -51,17 +54,20 @@
       epaper.classList.toggle("refresh",Boolean(powerOn&&stage>=7&&pending));
       status.textContent=stage===1?"NFC field detected. Energy is being coupled into the SwingTag antenna.":stage===2?"The passive antenna is receiving coupled NFC energy.":stage===3?"The ST25 is harvesting RF energy.":stage===4?"VSTORE is below 2.8 V. Harvested energy is charging the 4700 µF reservoir.":stage===5?"Threshold reached. Checking available energy for the requested display update.":stage===6?"Enough energy is available. Buck-boost regulator active; output stabilised at 3.3 V.":pending?"STM32 powered. Updating the e-paper display.":"Power is available, but no e-paper update is queued.";
       if(stage===7&&pending&&elapsed>15400){epaperText.textContent="UPDATE SUCCESSFUL";status.textContent="SwingTag update completed successfully.";revealSuccess();}
+      if(elapsed>15400&&!powerOn){status.textContent="Insufficient harvested energy. The power path remained OFF—try the harvest again.";revealFailure(v,energy);}
       if(elapsed<16000)raf=requestAnimationFrame(paint);
     }
-    function replay(){cancelAnimationFrame(raf);closeReveal();successShown=false;lastMobileStage=0;epaper.classList.remove("refresh");flowScroller.scrollTo({left:0,behavior:"auto"});start=performance.now();raf=requestAnimationFrame(paint);}
-    document.querySelector("#replayFlow").addEventListener("click",replay);
+    function replay(forceWeak=weakAttempt){cancelAnimationFrame(raf);closeReveal();closeFailure();successShown=false;failureShown=false;weakAttempt=forceWeak;lastMobileStage=0;epaper.classList.remove("refresh");flowScroller.scrollTo({left:0,behavior:"auto"});start=performance.now();raf=requestAnimationFrame(paint);}
+    document.querySelector("#replayFlow").addEventListener("click",()=>replay(!weakAttempt));
     document.querySelector("#nameForm").addEventListener("submit",e=>{
       e.preventDefault();const name=escText(document.querySelector("#visitorName").value);if(!name)return;pending={name,compliment:nextCompliment()};pendingBox.querySelector("span").textContent="UPDATE QUEUED — HARVESTING ENERGY…";pendingBox.querySelector("strong").textContent=`Pending e-paper update: ${name.toUpperCase()} — “${pending.compliment}.”`;replay();stageRoot.scrollIntoView({behavior:"smooth",block:"start"});
     });
     document.querySelector("#closeReveal").addEventListener("click",closeReveal);
-    document.querySelector("#replaySuccess").addEventListener("click",replay);
+    document.querySelector("#replaySuccess").addEventListener("click",()=>replay(true));
+    document.querySelector("#closeFailure").addEventListener("click",closeFailure);
+    document.querySelector("#tryHarvestAgain").addEventListener("click",()=>replay(false));
     document.querySelector("#anotherName").addEventListener("click",()=>{closeReveal();pending=null;pendingBox.querySelector("span").textContent="NO UPDATE QUEUED";pendingBox.querySelector("strong").textContent="Enter a name to prepare the next e-paper message.";const input=document.querySelector("#visitorName");input.value="";document.querySelector(".queue-lab").scrollIntoView({behavior:"smooth"});input.focus();});
-    replay();
+    replay(false);
   }
 
   const NS="http://www.w3.org/2000/svg";
