@@ -1,0 +1,14 @@
+.mobile-swipe-hint{display:none}
+@media(max-width:900px){
+  .mobile-swipe-hint{display:flex;align-items:center;justify-content:center;gap:12px;margin:0;padding:12px 18px;color:#fbc6df;background:rgba(250,77,156,.08);font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+  .mobile-swipe-hint span{color:var(--lime);font-size:18px;animation:swipeHint 1.4s ease-in-out infinite alternate}
+  .flow-scroll{overflow-x:auto;overflow-y:hidden;padding:20px calc((100vw - min(82vw,340px))/2);scroll-snap-type:x mandatory;scroll-padding-inline:calc((100vw - min(82vw,340px))/2);overscroll-behavior-x:contain;overscroll-behavior-y:none;-webkit-overflow-scrolling:touch;touch-action:pan-x;scrollbar-width:none}
+  .flow-scroll::-webkit-scrollbar{display:none}
+  .seven-stage-flow{width:max-content;min-width:0;align-items:stretch}
+  .flow-card{flex:0 0 min(82vw,340px);min-height:430px;scroll-snap-align:center;scroll-snap-stop:always}
+  .energy-link{flex:0 0 34px}
+  .energy-link i{animation-duration:1s}
+  .original-flow-head{padding-bottom:20px}
+}
+@keyframes swipeHint{from{transform:translateX(-4px)}to{transform:translateX(4px)}}
+@media(prefers-reduced-motion:reduce){.mobile-swipe-hint span{animation:none}}
