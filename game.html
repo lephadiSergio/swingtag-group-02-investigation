@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Play Group 02's SwingTag NFC sweet-spot challenge and join the local leaderboard." />
-  <title>SwingTag NFC Challenge — Group 02</title>
+  <meta name="description" content="Explore Group 02's representative 0–8 cm SwingTag NFC range simulation and join the local leaderboard." />
+  <title>SwingTag NFC Range Challenge — Group 02</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="enhancements.css?v=dashboard2" />
-  <link rel="stylesheet" href="game.css" />
+  <link rel="stylesheet" href="game.css?v=range8" />
+  <link rel="stylesheet" href="game-range.css?v=range8" />
 </head>
 <body>
   <div class="noise"></div>
@@ -40,8 +41,8 @@
       </div>
 
       <div class="game-heading">
-        <div><div class="section-kicker">THE NFC SWEET-SPOT CHALLENGE</div><h1>Bring the phone close. Not that close.</h1></div>
-        <p>Help Sergio position the phone relative to the e-paper control system held by Masixole. The current team observation places the target window at approximately <strong>15–20 mm</strong>. Each engineer gets only <strong>two attempts</strong>. Coupling and energy remain hidden until a distance is tested.</p>
+        <div><div class="section-kicker">THE NFC RANGE CHALLENGE</div><h1>Closer field. More harvested energy.</h1></div>
+        <p>Help Sergio position the phone relative to the e-paper control system held by Masixole across the investigation range of <strong>0–8 cm</strong>. Each engineer gets only <strong>two attempts</strong>. The simulated outputs remain hidden until a distance is tested.</p>
       </div>
 
       <div class="game-grid">
@@ -71,7 +72,7 @@
               <span class="object-label">E-paper tag</span>
             </div>
 
-            <div class="distance-ruler" aria-hidden="true"><span>0 mm</span><div class="ruler-line"></div><span>20 mm</span></div>
+            <div class="distance-ruler" aria-hidden="true"><div class="ruler-line"></div><div class="ruler-ticks"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8 cm</span></div></div>
           </div>
         </div>
 
@@ -80,18 +81,20 @@
           <input id="playerName" class="player-input" type="text" maxlength="18" autocomplete="nickname" placeholder="e.g. NFC Ninja" />
           <p class="attempt-hint" id="attemptHint">Enter your name to unlock two attempts.</p>
           <label class="distance-label" for="distanceSlider">Set the phone-to-tag distance</label>
-          <input id="distanceSlider" class="distance-slider" type="range" min="0" max="20" value="10" step="1" />
-          <div class="range-labels"><span>0 mm · hardware cuddle</span><span>20 mm · outer target</span></div>
+          <input id="distanceSlider" class="distance-slider" type="range" min="0" max="8" value="4" step="1" list="distanceMarks" />
+          <datalist id="distanceMarks"><option value="0"></option><option value="1"></option><option value="2"></option><option value="3"></option><option value="4"></option><option value="5"></option><option value="6"></option><option value="7"></option><option value="8"></option></datalist>
+          <div class="slider-ticks" aria-hidden="true"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8 cm</span></div>
+          <div class="range-labels"><span>0–2 cm · very strong</span><span>3–5 cm · moderate</span><span>6–7 cm · weak</span><span>8 cm · near failure</span></div>
           <div class="game-actions"><button id="testDistanceBtn" class="game-primary" type="button">Test this distance</button><button id="resetGameBtn" class="game-secondary" type="button">New round</button></div>
-          <div class="game-result idle" id="gameResult" role="status" aria-live="polite"><span>READY</span><strong>Your result is still classified.</strong><p>Enter a name, choose 0–20 mm and test. Coupling and calculated storage energy will appear afterwards.</p></div>
+          <div class="game-result idle" id="gameResult" role="status" aria-live="polite"><span>READY</span><strong>Your result is still classified.</strong><p>Enter a name, choose 0–8 cm and test. The representative NFC and energy outputs will appear afterwards.</p></div>
           <div class="energy-readout" id="energyReadout" hidden>
-            <div class="energy-title"><span>CALCULATED GAME ESTIMATE</span><strong>What did that attempt harvest?</strong></div>
-            <div class="energy-metrics"><div><span>EST. COUPLING</span><strong id="revealedCoupling">—</strong></div><div><span>EST. STORAGE VOLTAGE</span><strong id="revealedVoltage">—</strong></div><div><span>CALCULATED ENERGY</span><strong id="revealedEnergy">—</strong></div></div>
-            <div class="energy-target" id="energyTarget">Target storage range: 3.3–4.0 V.</div>
+            <div class="energy-title"><span>REPRESENTATIVE TREND BASED ON OUR EXPERIMENTAL INVESTIGATION</span><strong>What did that attempt harvest?</strong></div>
+            <div class="energy-metrics"><div><span>NFC FIELD STRENGTH</span><strong id="revealedCoupling">—</strong></div><div><span>HARVESTED VOLTAGE</span><strong id="revealedVoltage">—</strong></div><div><span>CAPACITOR ENERGY</span><strong id="revealedEnergy">—</strong></div><div><span>CHARGING RATE</span><strong id="revealedChargeRate">—</strong></div><div><span>TIME TO THRESHOLD</span><strong id="revealedThresholdTime">—</strong></div><div><span>UPDATE LATENCY</span><strong id="revealedLatency">—</strong></div><div><span>UPDATE SUCCESS</span><strong id="revealedSuccess">—</strong></div></div>
+            <div class="energy-target" id="energyTarget">Closer phone → stronger field → faster, more reliable update.</div>
             <div class="did-you-know"><span>DID YOU KNOW?</span><strong id="energyFactTitle">A few millijoules can still do useful work.</strong><ul id="energyFacts"></ul></div>
             <code>E = ½CV² · C = 4700 µF</code>
           </div>
-          <p class="game-caveat">Teaching game based on the team's current 15–20 mm observation. Coupling, voltage and energy displayed here are illustrative calculations—not RF measurements. Actual V<sub>EH</sub>, charging time, alignment, losses and update energy must be measured on hardware.</p>
+          <p class="game-caveat"><strong>Representative trend based on our experimental investigation.</strong> Values are website-simulation estimates, not exact measurements. Actual V<sub>EH</sub>, charging time, alignment, losses and update energy must be verified from the recorded hardware dataset.</p>
         </aside>
       </div>
 
@@ -110,7 +113,7 @@
     </div>
     <div class="tag-card-3d"><div class="tag-lanyard" aria-hidden="true"></div><div class="tag-card-face">
       <span class="tag-brand">SWINGTAG</span><span class="tag-refresh-label">E-PAPER REFRESH COMPLETE</span>
-      <strong id="tagEngineerName">NFC Engineer</strong><span class="tag-award">87%+ COUPLING CHAMPION</span>
+      <strong id="tagEngineerName">NFC Engineer</strong><span class="tag-award">NFC RANGE CHAMPION</span>
       <div class="tag-nfc-mark" aria-hidden="true"><i></i><i></i><i></i></div>
     </div><div class="tag-timer"><span></span></div></div>
   </div>
@@ -135,9 +138,9 @@
     </div>
   </div>
 
-  <footer><span>SwingTag · Group 02 · 2026</span><span>NFC sweet-spot challenge · calculations are illustrative</span></footer>
+  <footer><span>SwingTag · Group 02 · 2026</span><span>NFC range challenge · representative 0–8 cm trend</span></footer>
   <script src="enhancements.js?v=dashboard2"></script>
-  <script src="game.js"></script>
+  <script src="game.js?v=range8"></script>
   <script>document.getElementById('themeBtn')?.addEventListener('click', () => document.body.classList.toggle('alt'));</script>
 </body>
 </html>
