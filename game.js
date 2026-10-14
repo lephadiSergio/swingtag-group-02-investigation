@@ -155,6 +155,14 @@
     return 0.5 * CAPACITANCE_F * voltage * voltage * 1000;
   }
 
+  function formatEnergyMillijoules(value) {
+    return value < 1 ? value.toFixed(2) : value.toFixed(1);
+  }
+
+  function formatIdealRuntime(value) {
+    return value > 0 && value < 0.1 ? "<0.1" : value.toFixed(1);
+  }
+
   function updateScene() {
     const distanceCm = Number(slider.value);
     const model = modelFor(distanceCm);
@@ -287,7 +295,7 @@
     energyReadout.hidden = false;
     revealedCoupling.textContent = `${model.field}%`;
     revealedVoltage.textContent = `${voltage.toFixed(2)} V`;
-    revealedEnergy.textContent = `${energyMj.toFixed(1)} mJ`;
+    revealedEnergy.textContent = `${formatEnergyMillijoules(energyMj)} mJ`;
     revealedChargeRate.textContent = model.chargeRate >= 1 ? `${model.chargeRate.toFixed(0)} mV/s` : `<1 mV/s`;
     revealedThresholdTime.textContent = model.thresholdTime === null ? "Not reached" : `${model.thresholdTime} s`;
     revealedLatency.textContent = model.latency === null ? "Incomplete" : `${model.latency} s`;
@@ -300,12 +308,12 @@
         : distanceCm <= 7
           ? `${distanceCm} cm: weak coupling, slow accumulation and a low success probability.`
           : `8 cm: near-failure region; the reservoir normally cannot support a reliable update.`;
-    energyFactTitle.textContent = `${energyMj.toFixed(1)} mJ is small—but not useless.`;
+    energyFactTitle.textContent = `${formatEnergyMillijoules(energyMj)} mJ is small—but not useless.`;
 
     const comparisons = [
-      `Ideally power a 10 mW LED for about ${ledSeconds.toFixed(1)} s.`,
-      `Ideally power a 5 mW sensor for about ${sensorSeconds.toFixed(1)} s.`,
-      `Ideally run a 20 mW MCU task for about ${mcuSeconds.toFixed(1)} s.`,
+      `Ideally power a 10 mW LED for about ${formatIdealRuntime(ledSeconds)} s.`,
+      `Ideally power a 5 mW sensor for about ${formatIdealRuntime(sensorSeconds)} s.`,
+      `Ideally run a 20 mW MCU task for about ${formatIdealRuntime(mcuSeconds)} s.`,
       `Representative update-success probability at ${distanceCm} cm: ${model.success}%.`,
       energyMj >= displayScreeningMj
         ? `It exceeds the earlier 31.5 mJ display-only screening estimate—but the MCU and conversion losses still need energy.`
