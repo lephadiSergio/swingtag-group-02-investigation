@@ -1,106 +1,107 @@
 (() => {
-  const slider = document.getElementById("distanceSlider");
-  const testButton = document.getElementById("testDistanceBtn");
-  const resetButton = document.getElementById("resetGameBtn");
-  const result = document.getElementById("gameResult");
-  const playerName = document.getElementById("playerName");
-  const attemptHint = document.getElementById("attemptHint");
-  const stage = document.getElementById("gameStage");
-  const fieldSpark = document.getElementById("fieldSpark");
-  const leaderboardBody = document.getElementById("leaderboardBody");
-  const tagReveal = document.getElementById("tagReveal");
-  const tagEngineerName = document.getElementById("tagEngineerName");
-  const tagRevealClose = document.getElementById("tagRevealClose");
-  const roastReveal = document.getElementById("roastReveal");
-  const roastHeading = document.getElementById("roastHeading");
-  const roastCopy = document.getElementById("roastCopy");
-  const roastAttempt = document.getElementById("roastAttempt");
-  const energyReadout = document.getElementById("energyReadout");
-  const revealedCoupling = document.getElementById("revealedCoupling");
-  const revealedVoltage = document.getElementById("revealedVoltage");
-  const revealedEnergy = document.getElementById("revealedEnergy");
-  const revealedChargeRate = document.getElementById("revealedChargeRate");
-  const revealedThresholdTime = document.getElementById("revealedThresholdTime");
-  const revealedLatency = document.getElementById("revealedLatency");
-  const revealedSuccess = document.getElementById("revealedSuccess");
-  const energyTarget = document.getElementById("energyTarget");
-  const energyFactTitle = document.getElementById("energyFactTitle");
-  const energyFacts = document.getElementById("energyFacts");
-  const perfectScoreReveal = document.getElementById("perfectScoreReveal");
-  const perfectScoreName = document.getElementById("perfectScoreName");
-  const perfectScoreVideo = document.getElementById("perfectScoreVideo");
-  const perfectScoreClose = document.getElementById("perfectScoreClose");
+  const byId = id => document.getElementById(id);
+  const gameStart = byId("gameStart");
+  const experimentControls = byId("experimentControls");
+  const playerName = byId("playerName");
+  const nameError = byId("nameError");
+  const startButton = byId("startGameBtn");
+  const slider = byId("distanceSlider");
+  const distanceOutput = byId("distanceOutput");
+  const testButton = byId("testDistanceBtn");
+  const lifelineButton = byId("lifelineBtn");
+  const lifelineHint = byId("lifelineHint");
+  const scoreValue = byId("scoreValue");
+  const attemptsValue = byId("attemptsValue");
+  const lifelinesValue = byId("lifelinesValue");
+  const stateValue = byId("stateValue");
+  const activePlayer = byId("activePlayer");
+  const result = byId("gameResult");
+  const earnedResult = byId("earnedResult");
+  const resultDistance = byId("resultDistance");
+  const resultVoltage = byId("resultVoltage");
+  const resultStorage = byId("resultStorage");
+  const resultOutcome = byId("resultOutcome");
+  const notebookBody = byId("notebookBody");
+  const leaderboardBody = byId("leaderboardBody");
+  const stage = byId("gameStage");
+  const fieldSpark = byId("fieldSpark");
+  const energyPath = byId("energyPath");
+  const capacitorFill = byId("capacitorFill");
+  const displayState = byId("displayState");
+  const processNodes = [...document.querySelectorAll(".process-node")];
+  const challengeCard = byId("challengeCard");
+  const challengeChoices = byId("challengeChoices");
+  const submitChallengeButton = byId("submitChallengeBtn");
+  const skipChallengeButton = byId("skipChallengeBtn");
+  const challengeFeedback = byId("challengeFeedback");
+  const takeawayCard = byId("takeawayCard");
+  const playAgainButton = byId("playAgainBtn");
+  const tagReveal = byId("tagReveal");
+  const tagRevealClose = byId("tagRevealClose");
+  const tagEngineerName = byId("tagEngineerName");
+  const roastReveal = byId("roastReveal");
+  const roastHeading = byId("roastHeading");
+  const roastCopy = byId("roastCopy");
+  const roastAttempt = byId("roastAttempt");
 
   if (!slider || !testButton || !leaderboardBody) return;
 
-  const SCORE_KEY_V1 = "swingtag-nfc-leaderboard-v1";
-  const SCORE_KEY_V2 = "swingtag-nfc-leaderboard-v2";
-  const SCORE_KEY_V3 = "swingtag-nfc-leaderboard-v3";
-  const ATTEMPT_KEY = "swingtag-nfc-attempts-v3";
   const MAX_DISTANCE_CM = 8;
-  const MAX_ATTEMPTS = 2;
-  const CAPACITANCE_F = 0.0047;
-  const TARGET_MIN_V = 3.3;
-  const REPRESENTATIVE_MODEL = [
-    { field:100, voltage:4.85, chargeRate:410, thresholdTime:7, latency:11, success:99, band:"very strong" },
-    { field:96, voltage:4.55, chargeRate:340, thresholdTime:9, latency:13, success:98, band:"very strong" },
-    { field:88, voltage:4.15, chargeRate:260, thresholdTime:12, latency:16, success:94, band:"very strong" },
-    { field:77, voltage:3.65, chargeRate:180, thresholdTime:20, latency:25, success:85, band:"moderate" },
-    { field:63, voltage:3.00, chargeRate:105, thresholdTime:40, latency:46, success:70, band:"moderate" },
-    { field:45, voltage:2.25, chargeRate:55, thresholdTime:95, latency:105, success:48, band:"moderate" },
-    { field:27, voltage:1.45, chargeRate:22, thresholdTime:240, latency:260, success:24, band:"weak" },
-    { field:11, voltage:0.70, chargeRate:7, thresholdTime:650, latency:690, success:7, band:"weak" },
-    { field:1, voltage:0.10, chargeRate:0.5, thresholdTime:null, latency:null, success:1, band:"near failure" }
+  const STARTING_SCORE = 1000;
+  const MAX_LIFELINES = 3;
+  const SCORE_KEY = "swingtag-investigation-leaderboard-v1";
+  const SUCCESS_THRESHOLD_V = 3.3;
+  const MODEL = [
+    { voltage: 4.80, spread: 0.10 },
+    { voltage: 4.50, spread: 0.10 },
+    { voltage: 4.15, spread: 0.15 },
+    { voltage: 3.60, spread: 0.20 },
+    { voltage: 3.00, spread: 0.20 },
+    { voltage: 2.25, spread: 0.25 },
+    { voltage: 1.45, spread: 0.25 },
+    { voltage: 0.65, spread: 0.25 },
+    { voltage: 0.10, spread: 0.10 }
   ];
-  const TAG_REVEAL_MS = 10000;
-  const ROAST_REVEAL_MS = 4300;
-  let roundStartedAt = Date.now();
-  let roundWon = false;
-  let revealTimer = null;
-  let roastTimer = null;
+  const HINTS = [
+    "NFC magnetic coupling generally becomes weaker as separation increases.",
+    "Watch how quickly the energy-storage element charges after each attempt.",
+    "The useful operating region occurs before coupling becomes too weak to sustain the required energy."
+  ];
+  const ROASTS = [
+    ["THE CAPACITOR FILED AN EMPTY REPORT ⚡", "Interesting result. The reservoir would like the next experiment to be more persuasive."],
+    ["THE E-PAPER SAID ‘I’LL WAIT’ 🧪", "No refresh this time. Record the evidence and choose the next test condition."],
+    ["ENERGY BUDGET: AUDITION UNSUCCESSFUL ⚡", "The update did not pass the energy gate, but the failed test is still useful evidence."],
+    ["THE ELECTRONS REQUESTED BETTER WORKING CONDITIONS 🧪", "This trial is now in the notebook. Your next decision remains classified."],
+    ["STM32 STATUS: POLITELY UNIMPRESSED ⚡", "The system stayed off. That result belongs in the investigation, not in the bin."]
+  ];
 
-  const roasts = {
-    strong: [
-      ["THE FIELD HAD ONE JOB 😂", "You chose the strongest region and still rolled the tiny failure chance. Even Maxwell is confused."],
-      ["NFC PLOT TWIST 🤣", "Excellent distance, terrible luck. Keep the phone aligned and try that strong 0–2 cm region again."],
-      ["THE ANTENNAS SNEEZED 😂", "That spacing was strong, but this simulated attempt glitched at the finish line. One retry should rescue it."]
-    ],
-    moderate: [
-      ["ENERGY IS TAKING THE SCENIC ROUTE 😂", "At 3–5 cm the capacitor needs patience, alignment and a motivational speech."],
-      ["THE TAG FELT A VIBE 🤣", "A vibe is not yet a reliable e-paper update. Move toward 0–2 cm for stronger coupling."],
-      ["CHARGING… EMOTIONALLY 😂", "The field is present, but the reservoir is collecting energy one dramatic electron at a time."],
-      ["MEDIUM DISTANCE, MAXIMUM SUSPENSE 🤣", "The update probability is dropping. Bring Sergio's phone closer to Masixole's tag."]
-    ],
-    weak: [
-      ["THE MAGNETIC FIELD NEEDS BINOCULARS 😂", "At 6–7 cm the tag can barely see the phone. Move closer before the capacitor retires."],
-      ["WIRELESS POWER, VERY WIRELESS RESULTS 🤣", "The spacing is impressive. The harvested energy is not."],
-      ["MASIXOLE IS STILL WAITING 😂", "The tag saw the phone in the distance, waved politely and received almost no useful energy."],
-      ["THAT CHARGE TIME HAS A BIRTHDAY 😂", "Weak coupling means a painfully slow reservoir. Try the strong 0–2 cm region."]
-    ],
-    failure: [
-      ["EIGHT CENTIMETRES OF OPTIMISM 😂", "The field has left the chat. Move the phone much closer if you want that e-paper to refresh."],
-      ["NFC SAID: WHO ARE YOU? 🤣", "At 8 cm the harvested voltage is almost zero. The tag is basically receiving a postcard."],
-      ["UPDATE STATUS: ABSOLUTELY NOT 😂", "The capacitor collected hopes and dreams, but almost no energy. Try 0–2 cm."]
-    ],
-    final: [
-      ["TWO ATTEMPTS. BOTH COOKED. 😂🤣", "This engineer has been temporarily banned from estimating distances by eye."],
-      ["GAME OVER, PROFESSOR NFC 🤣😂", "The tag remains unchanged, but the laboratory has gained a fantastic cautionary tale."],
-      ["THE MAGNETIC FIELD HAS LEFT THE CHAT 😂", "Two guesses used. Please hand the phone to the next brave engineer."],
-      ["QUALIFICATIONS UNDER REVIEW 🤣", "The antennas requested a second opinion. This name has used both attempts."]
-    ]
+  const state = {
+    player: "",
+    startedAt: 0,
+    attempts: 0,
+    unsuccessful: 0,
+    lifelinesRemaining: MAX_LIFELINES,
+    tests: [],
+    won: false,
+    busy: false,
+    challengeBonus: 0,
+    challengeAnswered: false,
+    leaderboardSubmitted: false,
+    lockedTimePenalty: null,
+    revealTimer: null,
+    roastTimer: null,
+    scoreTimer: null
   };
 
-  function randomRoast(group) {
-    const options = roasts[group];
-    return options[Math.floor(Math.random() * options.length)];
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const delay = ms => new Promise(resolve => window.setTimeout(resolve, reducedMotion ? Math.min(40, ms) : ms));
+
+  function cleanName(value) {
+    return value.trim().replace(/\s+/g, " ").replace(/[^\p{L}\p{N} .'-]/gu, "").slice(0, 20);
   }
 
-  function normaliseName(value) {
-    return value.trim().replace(/\s+/g, " ").toLocaleLowerCase();
-  }
-
-  function displayName() {
-    return playerName.value.trim().replace(/\s+/g, " ").slice(0, 18);
+  function nameKey(value) {
+    return cleanName(value).toLocaleLowerCase();
   }
 
   function readJson(key, fallback) {
@@ -116,153 +117,229 @@
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch {
-      // The game remains playable if browser storage is unavailable.
+      // Browser storage is optional; the game still works without it.
     }
   }
 
-  function readAttempts() {
-    const data = readJson(ATTEMPT_KEY, {});
-    return data && typeof data === "object" && !Array.isArray(data) ? data : {};
+  function elapsedPenalty() {
+    if (Number.isFinite(state.lockedTimePenalty)) return state.lockedTimePenalty;
+    if (!state.startedAt) return 0;
+    return Math.min(100, Math.floor((Date.now() - state.startedAt) / 30000) * 5);
   }
 
-  function attemptsUsed(nameKey) {
-    return Math.min(MAX_ATTEMPTS, Number(readAttempts()[nameKey]) || 0);
+  function currentScore() {
+    return Math.max(0, STARTING_SCORE - state.unsuccessful * 50 - (MAX_LIFELINES - state.lifelinesRemaining) * 100 - elapsedPenalty() + state.challengeBonus);
   }
 
-  function recordAttempt(nameKey) {
-    const ledger = readAttempts();
-    ledger[nameKey] = Math.min(MAX_ATTEMPTS, (Number(ledger[nameKey]) || 0) + 1);
-    writeJson(ATTEMPT_KEY, ledger);
-    return ledger[nameKey];
+  function updateHud() {
+    scoreValue.textContent = String(currentScore());
+    attemptsValue.textContent = String(state.attempts);
+    lifelinesValue.textContent = state.lifelinesRemaining > 0 ? Array(state.lifelinesRemaining).fill("💡").join(" ") : "NONE";
+    lifelinesValue.setAttribute("aria-label", `${state.lifelinesRemaining} lifelines remaining`);
+    stateValue.textContent = !state.player ? "NOT STARTED" : state.busy ? "TESTING" : state.won ? "UPDATE COMPLETE" : "INVESTIGATING";
   }
 
-  function modelFor(distanceCm) {
-    const safeDistance = Math.max(0, Math.min(MAX_DISTANCE_CM, Math.round(distanceCm)));
-    return REPRESENTATIVE_MODEL[safeDistance];
-  }
-
-  function deterministicRoll(nameKey, distanceCm, attempt) {
-    const seed = `${nameKey}|${distanceCm}|${attempt}`;
-    let hash = 2166136261;
-    for (let index = 0; index < seed.length; index += 1) {
-      hash ^= seed.charCodeAt(index);
-      hash = Math.imul(hash, 16777619);
-    }
-    return (Math.abs(hash) % 100) + 1;
-  }
-
-  function energyMillijoules(voltage) {
-    return 0.5 * CAPACITANCE_F * voltage * voltage * 1000;
-  }
-
-  function formatEnergyMillijoules(value) {
-    return value < 1 ? value.toFixed(2) : value.toFixed(1);
-  }
-
-  function formatIdealRuntime(value) {
-    return value > 0 && value < 0.1 ? "<0.1" : value.toFixed(1);
-  }
-
-  function updateScene() {
-    const distanceCm = Number(slider.value);
-    const model = modelFor(distanceCm);
-    const left = 4 + ((MAX_DISTANCE_CM - distanceCm) / MAX_DISTANCE_CM) * 44;
-    stage.style.setProperty("--sergio-left", `${left}%`);
-    stage.style.setProperty("--field-strength", String(Math.max(.03, model.field / 100)));
-    fieldSpark.textContent = "?";
-  }
-
-  function setResult(state, label, heading, copy) {
-    result.className = `game-result ${state}`;
+  function setResult(kind, label, heading, copy) {
+    result.className = `game-result ${kind}`;
     result.querySelector("span").textContent = label;
     result.querySelector("strong").textContent = heading;
     result.querySelector("p").textContent = copy;
   }
 
-  function refreshAttemptState() {
-    const name = displayName();
-    const key = normaliseName(name);
-    if (!key) {
-      attemptHint.textContent = "Enter your name to unlock two attempts.";
-      testButton.disabled = false;
-      testButton.textContent = "Test this distance";
-      return;
+  function hashUnit(seed) {
+    let hash = 2166136261;
+    for (let index = 0; index < seed.length; index += 1) {
+      hash ^= seed.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
     }
-
-    const used = attemptsUsed(key);
-    const remaining = MAX_ATTEMPTS - used;
-    attemptHint.textContent = remaining > 0
-      ? `${name} has ${remaining} ${remaining === 1 ? "attempt" : "attempts"} remaining on this browser.`
-      : `${name} has used both attempts. Enter the next engineer's name.`;
-    testButton.disabled = remaining === 0 || roundWon;
-    testButton.textContent = remaining === 0 ? "Two attempts used" : "Test this distance";
+    return ((hash >>> 0) % 2001) / 1000 - 1;
   }
 
-  function readScores() {
-    const current = readJson(SCORE_KEY_V3, null);
-    if (Array.isArray(current)) {
-      const unique = new Map();
-      current
-        .filter(entry => Number(entry.attempts) <= MAX_ATTEMPTS)
-        .forEach(entry => {
-          const key = normaliseName(String(entry.name || ""));
-          const previous = unique.get(key);
-          if (key && (!previous || Number(entry.score) > Number(previous.score))) unique.set(key, entry);
-        });
-      const cleaned = [...unique.values()];
-      if (cleaned.length !== current.length) writeJson(SCORE_KEY_V3, cleaned);
-      return cleaned;
-    }
-
-    const millimetreScores = readJson(SCORE_KEY_V2, null);
-    const legacy = Array.isArray(millimetreScores) ? millimetreScores : readJson(SCORE_KEY_V1, []);
-    if (!Array.isArray(legacy)) return [];
-    const migrated = legacy
-      .filter(entry => Number(entry.attempts) <= MAX_ATTEMPTS)
-      .map(entry => ({
-        name: entry.name,
-        score: entry.score,
-        distanceCm: Number.isFinite(Number(entry.distanceMm)) ? Number(entry.distanceMm) / 10 : Number(entry.distance),
-        attempts: entry.attempts,
-        timestamp: entry.timestamp,
-        unit: "cm"
-      }));
-    writeJson(SCORE_KEY_V3, migrated);
-    return migrated;
+  function simulateReading(distance, attempt) {
+    const model = MODEL[distance];
+    const variation = hashUnit(`${nameKey(state.player)}|${distance}|${attempt}`);
+    const voltage = Math.max(0, model.voltage + model.spread * variation);
+    const storage = Math.max(0, Math.min(100, Math.round(voltage / 3.6 * 100)));
+    const outcome = voltage >= SUCCESS_THRESHOLD_V && storage >= 90 ? "Successful" : voltage >= 2.6 ? "Partial" : "Failed";
+    return { voltage, storage, outcome, success: outcome === "Successful" };
   }
 
-  function writeScores(scores) {
-    writeJson(SCORE_KEY_V3, scores.slice(0, 8));
+  function updatePhonePosition() {
+    const distance = Number(slider.value);
+    const left = 4 + ((MAX_DISTANCE_CM - distance) / MAX_DISTANCE_CM) * 44;
+    stage.style.setProperty("--sergio-left", `${left}%`);
+    distanceOutput.textContent = `${distance} cm`;
+  }
+
+  function resetProcess() {
+    processNodes.forEach(node => node.classList.remove("active", "done", "failed"));
+    energyPath.classList.remove("running", "success", "failure");
+    stage.classList.remove("testing", "celebrate");
+    stage.style.setProperty("--field-strength", ".28");
+    fieldSpark.textContent = "?";
+    capacitorFill.style.transitionDuration = "0ms";
+    capacitorFill.style.width = "0%";
+    displayState.textContent = "Waiting";
+  }
+
+  async function animateProcess(distance, reading) {
+    resetProcess();
+    state.busy = true;
+    testButton.disabled = true;
+    lifelineButton.disabled = true;
+    updateHud();
+    setResult("idle", "RUNNING NFC TEST", `${distance} cm experiment in progress…`, "Observe the energy path and storage element. Results remain hidden until the sequence finishes.");
+    energyPath.classList.add("running");
+    stage.classList.add("testing");
+    const visibleStrength = Math.max(.05, reading.voltage / 4.9);
+    stage.style.setProperty("--field-strength", String(visibleStrength));
+    fieldSpark.textContent = "⚡";
+
+    for (const node of processNodes) {
+      node.classList.add("active");
+      if (node.dataset.step === "storage") {
+        const chargeDuration = 650 + distance * 125;
+        capacitorFill.style.transitionDuration = `${reducedMotion ? 50 : chargeDuration}ms`;
+        capacitorFill.style.width = `${reading.storage}%`;
+        await delay(chargeDuration);
+      } else {
+        await delay(360);
+      }
+      node.classList.remove("active");
+      node.classList.add("done");
+    }
+
+    const displayNode = processNodes.find(node => node.dataset.step === "display");
+    if (reading.success) {
+      displayState.textContent = "Refreshing";
+      energyPath.classList.add("success");
+      await delay(420);
+      displayState.textContent = "Updated";
+    } else {
+      displayState.textContent = "No update";
+      displayNode?.classList.add("failed");
+      energyPath.classList.add("failure");
+    }
+    state.busy = false;
+    testButton.disabled = state.won;
+    lifelineButton.disabled = state.won || state.lifelinesRemaining === 0;
+    updateHud();
+  }
+
+  function addNotebookEntry(distance, reading) {
+    if (state.tests.length === 1) notebookBody.replaceChildren();
+    const row = document.createElement("tr");
+    const values = [state.tests.length, `${distance} cm`, `${reading.voltage.toFixed(2)} V`, `${reading.storage}%`, reading.outcome];
+    values.forEach((value, index) => {
+      const cell = document.createElement("td");
+      cell.textContent = String(value);
+      if (index === 4) cell.dataset.outcome = reading.outcome.toLowerCase();
+      row.appendChild(cell);
+    });
+    notebookBody.appendChild(row);
+  }
+
+  function showEarnedResult(distance, reading) {
+    earnedResult.hidden = false;
+    resultDistance.textContent = `${distance} cm`;
+    resultVoltage.textContent = `${reading.voltage.toFixed(2)} V`;
+    resultStorage.textContent = `${reading.storage}%`;
+    resultOutcome.textContent = reading.outcome.toUpperCase();
+    resultOutcome.dataset.outcome = reading.outcome.toLowerCase();
+  }
+
+  function hideRoast() {
+    if (state.roastTimer) window.clearTimeout(state.roastTimer);
+    document.body.classList.remove("roast-showcase");
+    roastReveal.setAttribute("aria-hidden", "true");
+  }
+
+  function showRoast() {
+    hideRoast();
+    const [heading, copy] = ROASTS[(state.attempts - 1) % ROASTS.length];
+    roastHeading.textContent = heading;
+    roastCopy.textContent = copy;
+    roastAttempt.textContent = `Experiment ${state.attempts} recorded`;
+    roastReveal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("roast-showcase");
+    state.roastTimer = window.setTimeout(hideRoast, 2800);
+  }
+
+  function hideTagReveal() {
+    if (state.revealTimer) window.clearTimeout(state.revealTimer);
+    document.body.classList.remove("tag-showcase");
+    tagReveal.setAttribute("aria-hidden", "true");
+  }
+
+  function showTagReveal() {
+    hideRoast();
+    hideTagReveal();
+    tagEngineerName.textContent = state.player;
+    tagReveal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("tag-showcase");
+    tagRevealClose?.focus();
+    state.revealTimer = window.setTimeout(hideTagReveal, 7200);
+  }
+
+  function cleanLeaderboard() {
+    const raw = readJson(SCORE_KEY, []);
+    if (!Array.isArray(raw)) return [];
+    const unique = new Map();
+    raw.forEach(entry => {
+      const player = cleanName(String(entry.player || ""));
+      const score = Number(entry.score);
+      const attempts = Number(entry.attempts);
+      const lifelinesUsed = Number(entry.lifelinesUsed);
+      if (!player || !Number.isFinite(score) || !Number.isFinite(attempts) || !Number.isFinite(lifelinesUsed)) return;
+      const key = nameKey(player);
+      const safe = { player, score: Math.max(0, Math.round(score)), attempts: Math.max(1, Math.round(attempts)), lifelinesUsed: Math.max(0, Math.min(3, Math.round(lifelinesUsed))), updatedAt: Number(entry.updatedAt) || 0 };
+      const previous = unique.get(key);
+      if (!previous || safe.score > previous.score || (safe.score === previous.score && safe.attempts < previous.attempts)) unique.set(key, safe);
+    });
+    return [...unique.values()].sort((a, b) => b.score - a.score || a.attempts - b.attempts || a.lifelinesUsed - b.lifelinesUsed || b.updatedAt - a.updatedAt).slice(0, 10);
+  }
+
+  function writeLeaderboard(entries) {
+    writeJson(SCORE_KEY, entries.slice(0, 10));
+  }
+
+  function submitLeaderboard() {
+    const key = nameKey(state.player);
+    const entries = cleanLeaderboard().filter(entry => nameKey(entry.player) !== key);
+    entries.push({ player: state.player, score: currentScore(), attempts: state.attempts, lifelinesUsed: MAX_LIFELINES - state.lifelinesRemaining, updatedAt: Date.now() });
+    writeLeaderboard(entries.sort((a, b) => b.score - a.score || a.attempts - b.attempts || a.lifelinesUsed - b.lifelinesUsed || b.updatedAt - a.updatedAt));
+    state.leaderboardSubmitted = true;
+    renderLeaderboard();
   }
 
   function renderLeaderboard() {
-    const scores = readScores();
+    const entries = cleanLeaderboard();
+    writeLeaderboard(entries);
     leaderboardBody.replaceChildren();
-    if (!scores.length) {
+    if (!entries.length) {
       const row = document.createElement("tr");
       row.className = "leaderboard-empty";
       const cell = document.createElement("td");
       cell.colSpan = 5;
-      cell.textContent = "No champions yet. Be the first engineer to complete an update across the 0–8 cm investigation range.";
+      cell.textContent = "No completed investigations yet. The first successful engineer takes the crown.";
       row.appendChild(cell);
       leaderboardBody.appendChild(row);
       return;
     }
-
-    scores.forEach((entry, index) => {
+    entries.forEach((entry, index) => {
       const row = document.createElement("tr");
       if (index === 0) row.className = "leaderboard-champion";
-      const distanceCm = Number.isFinite(Number(entry.distanceCm)) ? Number(entry.distanceCm) : Number(entry.distanceMm) / 10;
-      [index + 1, entry.name, entry.score, `${distanceCm.toFixed(1)} cm`, entry.attempts].forEach((value, columnIndex) => {
+      const values = [index + 1, entry.player, entry.score, `${entry.attempts} ${entry.attempts === 1 ? "attempt" : "attempts"}`, `${entry.lifelinesUsed} ${entry.lifelinesUsed === 1 ? "hint" : "hints"}`];
+      values.forEach((value, columnIndex) => {
         const cell = document.createElement("td");
         if (index === 0 && columnIndex === 1) {
           const crown = document.createElement("span");
           crown.className = "leaderboard-crown";
           crown.setAttribute("aria-label", "Leaderboard champion");
           crown.textContent = "♛";
-          const championName = document.createElement("strong");
-          championName.textContent = String(value);
-          cell.append(crown, championName);
+          const name = document.createElement("strong");
+          name.textContent = String(value);
+          cell.append(crown, name);
         } else {
           cell.textContent = String(value);
         }
@@ -272,215 +349,157 @@
     });
   }
 
-  function saveWin(distanceCm, name, used, model) {
-    const elapsedSeconds = Math.floor((Date.now() - roundStartedAt) / 1000);
-    const distanceScore = distanceCm === 0 ? 100 : Math.round(model.success * .72 + model.field * .28);
-    const score = Math.max(25, Math.min(100, distanceScore - (used - 1) * 15 - Math.floor(elapsedSeconds / 15)));
-    const scores = readScores().filter(entry => normaliseName(String(entry.name || "")) !== normaliseName(name));
-    scores.push({ name, score, distanceCm, attempts: used, timestamp: Date.now(), unit: "cm" });
-    scores.sort((a, b) => b.score - a.score || a.attempts - b.attempts || a.timestamp - b.timestamp);
-    writeScores(scores);
-    renderLeaderboard();
-    return score;
-  }
+  async function runTest() {
+    if (!state.player || state.busy || state.won) return;
+    const distance = Number(slider.value);
+    state.attempts += 1;
+    const reading = simulateReading(distance, state.attempts);
+    state.tests.push({ distance, ...reading });
+    updateHud();
+    await animateProcess(distance, reading);
+    addNotebookEntry(distance, reading);
+    showEarnedResult(distance, reading);
 
-  function showEnergy(distanceCm, model) {
-    const voltage = model.voltage;
-    const energyMj = energyMillijoules(voltage);
-    const ledSeconds = energyMj / 10;
-    const sensorSeconds = energyMj / 5;
-    const mcuSeconds = energyMj / 20;
-    const displayScreeningMj = 31.5;
-
-    energyReadout.hidden = false;
-    revealedCoupling.textContent = `${model.field}%`;
-    revealedVoltage.textContent = `${voltage.toFixed(2)} V`;
-    revealedEnergy.textContent = `${formatEnergyMillijoules(energyMj)} mJ`;
-    revealedChargeRate.textContent = model.chargeRate >= 1 ? `${model.chargeRate.toFixed(0)} mV/s` : `<1 mV/s`;
-    revealedThresholdTime.textContent = model.thresholdTime === null ? "Not reached" : `${model.thresholdTime} s`;
-    revealedLatency.textContent = model.latency === null ? "Incomplete" : `${model.latency} s`;
-    revealedSuccess.textContent = `${model.success}%`;
-    energyTarget.className = `energy-target ${voltage >= TARGET_MIN_V ? "target-reached" : "target-low"}`;
-    energyTarget.textContent = distanceCm <= 2
-      ? `${distanceCm} cm: very strong coupling, fastest charging and the highest update reliability.`
-      : distanceCm <= 5
-        ? `${distanceCm} cm: moderate coupling, reduced voltage and a longer update cycle.`
-        : distanceCm <= 7
-          ? `${distanceCm} cm: weak coupling, slow accumulation and a low success probability.`
-          : `8 cm: near-failure region; the reservoir normally cannot support a reliable update.`;
-    energyFactTitle.textContent = `${formatEnergyMillijoules(energyMj)} mJ is small—but not useless.`;
-
-    const comparisons = [
-      `Ideally power a 10 mW LED for about ${formatIdealRuntime(ledSeconds)} s.`,
-      `Ideally power a 5 mW sensor for about ${formatIdealRuntime(sensorSeconds)} s.`,
-      `Ideally run a 20 mW MCU task for about ${formatIdealRuntime(mcuSeconds)} s.`,
-      `Representative update-success probability at ${distanceCm} cm: ${model.success}%.`,
-      energyMj >= displayScreeningMj
-        ? `It exceeds the earlier 31.5 mJ display-only screening estimate—but the MCU and conversion losses still need energy.`
-        : `It is below the earlier 31.5 mJ display-only screening estimate before MCU and conversion losses.`
-    ];
-    energyFacts.replaceChildren();
-    comparisons.forEach(copy => {
-      const item = document.createElement("li");
-      item.textContent = copy;
-      energyFacts.appendChild(item);
-    });
-  }
-
-  function hideTagReveal() {
-    if (revealTimer) window.clearTimeout(revealTimer);
-    revealTimer = null;
-    document.body.classList.remove("tag-showcase");
-    tagReveal.setAttribute("aria-hidden", "true");
-  }
-
-  function showTagReveal(name) {
-    hideRoast();
-    hideTagReveal();
-    tagEngineerName.textContent = name;
-    tagReveal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("tag-showcase");
-    tagRevealClose?.focus();
-    revealTimer = window.setTimeout(hideTagReveal, TAG_REVEAL_MS);
-  }
-
-  function hideRoast() {
-    if (roastTimer) window.clearTimeout(roastTimer);
-    roastTimer = null;
-    document.body.classList.remove("roast-showcase");
-    roastReveal.setAttribute("aria-hidden", "true");
-  }
-
-  function showRoast(group, used) {
-    hideTagReveal();
-    hideRoast();
-    const [heading, copy] = randomRoast(group);
-    roastHeading.textContent = heading;
-    roastCopy.textContent = copy;
-    roastAttempt.textContent = used >= MAX_ATTEMPTS ? "Both attempts used" : `Attempt ${used} of ${MAX_ATTEMPTS}`;
-    roastReveal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("roast-showcase");
-    roastTimer = window.setTimeout(hideRoast, ROAST_REVEAL_MS);
-  }
-
-  function hidePerfectScore() {
-    if (!perfectScoreReveal) return;
-    perfectScoreReveal.hidden = true;
-    perfectScoreReveal.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("perfect-score-showcase");
-    if (perfectScoreVideo) {
-      perfectScoreVideo.pause();
-      perfectScoreVideo.currentTime = 0;
+    if (reading.success) {
+      state.lockedTimePenalty = elapsedPenalty();
+      state.won = true;
+      window.clearInterval(state.scoreTimer);
+      testButton.disabled = true;
+      lifelineButton.disabled = true;
+      stage.classList.add("celebrate");
+      setResult("win", "SWINGTAG UPDATE SUCCESSFUL", `${distance} cm experiment completed the update.`, "The storage threshold was reached, the regulator activated, the STM32 powered and the e-paper refreshed.");
+      challengeCard.hidden = false;
+      challengeCard.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+      submitLeaderboard();
+      showTagReveal();
+    } else {
+      state.unsuccessful += 1;
+      setResult(reading.outcome === "Partial" ? "partial" : "miss", reading.outcome === "Partial" ? "PARTIAL ENERGY" : "INSUFFICIENT ENERGY", `${distance} cm experiment recorded.`, "Use the evidence in your notebook to choose the next test condition.");
+      showRoast();
     }
+    updateHud();
   }
 
-  function showPerfectScore(name) {
-    if (!perfectScoreReveal || !perfectScoreName) return;
-    perfectScoreName.textContent = name;
-    perfectScoreReveal.hidden = false;
-    perfectScoreReveal.setAttribute("aria-hidden", "false");
-    document.body.classList.add("perfect-score-showcase");
-    perfectScoreClose?.focus();
-    perfectScoreVideo?.play().catch(() => {
-      // Autoplay policies may require the visitor to press play; controls stay visible.
-    });
+  function useLifeline() {
+    if (!state.player || state.busy || state.won || state.lifelinesRemaining === 0) return;
+    const hintIndex = MAX_LIFELINES - state.lifelinesRemaining;
+    state.lifelinesRemaining -= 1;
+    lifelineHint.hidden = false;
+    lifelineHint.innerHTML = "";
+    const label = document.createElement("strong");
+    label.textContent = `Lifeline ${hintIndex + 1}`;
+    const copy = document.createElement("p");
+    copy.textContent = HINTS[hintIndex];
+    lifelineHint.append(label, copy);
+    if (state.lifelinesRemaining === 0) {
+      const exhausted = document.createElement("span");
+      exhausted.textContent = "NO LIFELINES REMAINING";
+      lifelineHint.appendChild(exhausted);
+      lifelineButton.disabled = true;
+      lifelineButton.textContent = "No lifelines remaining";
+    }
+    updateHud();
   }
 
-  function testDistance() {
-    const name = displayName();
-    const nameKey = normaliseName(name);
-    if (!nameKey) {
-      setResult("miss", "NAME REQUIRED", "Who is brave enough to play?", "Enter an engineer name first. The two-attempt limit is tracked by name on this browser.");
+  function startGame() {
+    const cleaned = cleanName(playerName.value);
+    if (!cleaned || cleaned.length < 2) {
+      nameError.textContent = "Enter a valid engineer name with at least two characters.";
       playerName.focus();
       return;
     }
-
-    if (roundWon) {
-      setResult("win", "ROUND COMPLETE", "The tag has already refreshed.", "Select New round for another engineer. Attempts remain restricted by name.");
-      return;
-    }
-
-    const previousUsed = attemptsUsed(nameKey);
-    if (previousUsed >= MAX_ATTEMPTS) {
-      refreshAttemptState();
-      setResult("miss", "ATTEMPTS USED", `${name}, your two guesses are gone.`, "Enter the next engineer's name to continue.");
-      showRoast("final", MAX_ATTEMPTS);
-      return;
-    }
-
-    const used = recordAttempt(nameKey);
-    const distanceCm = Number(slider.value);
-    const model = modelFor(distanceCm);
-    const roll = deterministicRoll(nameKey, distanceCm, used);
-    const updateSucceeded = roll <= model.success;
-    showEnergy(distanceCm, model);
-    stage.style.setProperty("--field-strength", String(Math.max(.03, model.field / 100)));
-    fieldSpark.textContent = model.field >= 60 ? "⚡" : "×";
-
-    if (updateSucceeded) {
-      roundWon = true;
-      const score = saveWin(distanceCm, name, used, model);
-      setResult("win", "3D TAG UNLOCKED", `${distanceCm} cm · ${model.field}% representative field`, `The simulated e-paper update completed in ${used} ${used === 1 ? "try" : "tries"}. Score: ${score}/100. Estimated update latency: ${model.latency ?? "incomplete"} s.`);
-      stage.classList.remove("celebrate");
-      void stage.offsetWidth;
-      stage.classList.add("celebrate");
-      showTagReveal(name);
-      if (score === 100) showPerfectScore(name);
-      refreshAttemptState();
-      return;
-    }
-
-    const remaining = MAX_ATTEMPTS - used;
-    setResult(
-      "miss",
-      remaining ? "NOT ENOUGH HARVESTED ENERGY" : "TWO ATTEMPTS USED",
-      `${distanceCm} cm · ${model.voltage.toFixed(2)} V · ${model.success}% representative success`,
-      remaining ? `One attempt remains for ${name}. Move closer for a stronger field, faster charging and a more reliable update.` : `${name} has used both attempts. The next engineer must enter a new name.`
-    );
-
-    let group = distanceCm <= 2 ? "strong" : distanceCm <= 5 ? "moderate" : distanceCm <= 7 ? "weak" : "failure";
-    if (!remaining) group = "final";
-    showRoast(group, used);
-    refreshAttemptState();
+    playerName.value = cleaned;
+    state.player = cleaned;
+    state.startedAt = Date.now();
+    nameError.textContent = "";
+    gameStart.hidden = true;
+    experimentControls.hidden = false;
+    activePlayer.textContent = cleaned;
+    state.scoreTimer = window.setInterval(updateHud, 1000);
+    updateHud();
+    slider.focus();
   }
 
-  function resetRound() {
-    roundWon = false;
-    roundStartedAt = Date.now();
-    slider.value = "4";
-    stage.classList.remove("celebrate");
+  function finishChallenge(skipped = false) {
+    challengeChoices.disabled = true;
+    submitChallengeButton.disabled = true;
+    skipChallengeButton.disabled = true;
+    if (skipped) challengeFeedback.textContent = "Bonus skipped. Your experimental result remains on the leaderboard.";
+    takeawayCard.hidden = false;
+    submitLeaderboard();
+    updateHud();
+  }
+
+  function submitChallenge() {
+    if (state.challengeAnswered) return;
+    const selected = document.querySelector('input[name="interpretation"]:checked');
+    if (!selected) {
+      challengeFeedback.textContent = "Choose one interpretation before submitting.";
+      return;
+    }
+    state.challengeAnswered = true;
+    if (selected.value === "c") {
+      state.challengeBonus = 100;
+      challengeFeedback.textContent = "Correct — 100 bonus points awarded.";
+      challengeFeedback.className = "challenge-feedback correct";
+    } else {
+      challengeFeedback.textContent = "Not quite. Compare the tested distances and stored-energy results in your notebook.";
+      challengeFeedback.className = "challenge-feedback incorrect";
+    }
+    finishChallenge(false);
+  }
+
+  function resetGame() {
+    window.clearInterval(state.scoreTimer);
     hideTagReveal();
     hideRoast();
-    hidePerfectScore();
-    energyReadout.hidden = true;
-    fieldSpark.textContent = "?";
-    setResult("idle", "READY", "Your result is still classified.", "Choose 0–8 cm and test. Field strength, voltage, charging and update behaviour appear only after the attempt.");
-    updateScene();
-    refreshAttemptState();
+    Object.assign(state, {
+      player: "", startedAt: 0, attempts: 0, unsuccessful: 0, lifelinesRemaining: MAX_LIFELINES,
+      tests: [], won: false, busy: false, challengeBonus: 0, challengeAnswered: false,
+      leaderboardSubmitted: false, lockedTimePenalty: null, revealTimer: null, roastTimer: null, scoreTimer: null
+    });
+    gameStart.hidden = false;
+    experimentControls.hidden = true;
+    playerName.value = "";
+    nameError.textContent = "";
+    slider.value = "4";
+    earnedResult.hidden = true;
+    testButton.disabled = false;
+    lifelineHint.hidden = true;
+    lifelineHint.replaceChildren();
+    lifelineButton.disabled = false;
+    lifelineButton.textContent = "Use a lifeline";
+    challengeCard.hidden = true;
+    takeawayCard.hidden = true;
+    challengeFeedback.textContent = "";
+    challengeFeedback.className = "challenge-feedback";
+    challengeChoices.disabled = false;
+    submitChallengeButton.disabled = false;
+    skipChallengeButton.disabled = false;
+    document.querySelectorAll('input[name="interpretation"]').forEach(input => { input.checked = false; });
+    notebookBody.innerHTML = '<tr class="notebook-empty"><td colspan="5">No experiments recorded yet.</td></tr>';
+    setResult("idle", "CHOOSE DISTANCE", "The system is ready.", "Select an untested or previously tested distance, then run the NFC experiment.");
+    resetProcess();
+    updatePhonePosition();
+    updateHud();
+    playerName.focus();
+    window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
   }
 
-  slider.addEventListener("input", updateScene);
-  playerName.addEventListener("input", () => {
-    roundWon = false;
-    roundStartedAt = Date.now();
-    refreshAttemptState();
-  });
-  testButton.addEventListener("click", testDistance);
-  resetButton.addEventListener("click", resetRound);
+  slider.addEventListener("input", updatePhonePosition);
+  startButton.addEventListener("click", startGame);
+  playerName.addEventListener("keydown", event => { if (event.key === "Enter") startGame(); });
+  testButton.addEventListener("click", runTest);
+  lifelineButton.addEventListener("click", useLifeline);
+  submitChallengeButton.addEventListener("click", submitChallenge);
+  skipChallengeButton.addEventListener("click", () => { if (!state.challengeAnswered) { state.challengeAnswered = true; finishChallenge(true); } });
+  playAgainButton.addEventListener("click", resetGame);
   tagRevealClose?.addEventListener("click", hideTagReveal);
-  tagReveal?.addEventListener("click", event => {
-    if (event.target === tagReveal) hideTagReveal();
-  });
-  perfectScoreClose?.addEventListener("click", hidePerfectScore);
-  perfectScoreReveal?.addEventListener("click", event => {
-    if (event.target === perfectScoreReveal) hidePerfectScore();
-  });
-  document.addEventListener("keydown", event => {
-    if (event.key !== "Escape") return;
-    if (!perfectScoreReveal?.hidden) hidePerfectScore();
-    else if (tagReveal.getAttribute("aria-hidden") === "false") hideTagReveal();
-  });
-  updateScene();
-  refreshAttemptState();
+  tagReveal?.addEventListener("click", event => { if (event.target === tagReveal) hideTagReveal(); });
+  document.addEventListener("keydown", event => { if (event.key === "Escape" && tagReveal.getAttribute("aria-hidden") === "false") hideTagReveal(); });
+
+  resetProcess();
+  updatePhonePosition();
+  updateHud();
   renderLeaderboard();
 })();
