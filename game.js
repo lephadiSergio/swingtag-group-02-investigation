@@ -15,6 +15,7 @@
   const lifelinesValue = byId("lifelinesValue");
   const stateValue = byId("stateValue");
   const activePlayer = byId("activePlayer");
+  const phoneCharacter = byId("sergioCharacter");
   const result = byId("gameResult");
   const earnedResult = byId("earnedResult");
   const resultDistance = byId("resultDistance");
@@ -102,6 +103,13 @@
 
   function nameKey(value) {
     return cleanName(value).toLocaleLowerCase();
+  }
+
+  function updatePhoneCharacter() {
+    const name = state.player || cleanName(playerName.value) || "Sergio";
+    phoneCharacter.querySelector(".name-flag").textContent = name;
+    phoneCharacter.querySelector("svg").setAttribute("aria-label", `Cartoon ${name} holding an NFC phone`);
+    phoneCharacter.closest(".nfc-scene").setAttribute("aria-label", `${name} holding a phone opposite Masixole holding the SwingTag e-paper system`);
   }
 
   function readJson(key, fallback) {
@@ -415,6 +423,7 @@
     gameStart.hidden = true;
     experimentControls.hidden = false;
     activePlayer.textContent = cleaned;
+    updatePhoneCharacter();
     state.scoreTimer = window.setInterval(updateHud, 1000);
     updateHud();
     slider.focus();
@@ -461,6 +470,7 @@
     gameStart.hidden = false;
     experimentControls.hidden = true;
     playerName.value = "";
+    updatePhoneCharacter();
     nameError.textContent = "";
     slider.value = "4";
     earnedResult.hidden = true;
@@ -488,6 +498,7 @@
 
   slider.addEventListener("input", updatePhonePosition);
   startButton.addEventListener("click", startGame);
+  playerName.addEventListener("input", updatePhoneCharacter);
   playerName.addEventListener("keydown", event => { if (event.key === "Enter") startGame(); });
   testButton.addEventListener("click", runTest);
   lifelineButton.addEventListener("click", useLifeline);
